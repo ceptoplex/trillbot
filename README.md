@@ -42,7 +42,7 @@ To build and run the application in a Linux production environment, use the foll
 
     ~$ dotnet restore
     ~$ dotnet build
-    ~$ set DOTNET_ENVIRONMENT=Production
+    ~$ set NETCORE_ENVIRONMENT=Production
     ~$ set TRILLBOT__DISCORD__TOKEN=<token>
     ~$ dotnet run --project=TrillBot.Discord.App
     
