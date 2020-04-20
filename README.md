@@ -1,8 +1,8 @@
 # TrillBot for Discord
 
-![GitHub Actions: Build & Deploy](https://github.com/ceptoplex/trillbot-discord/workflows/Build%20&%20Deploy/badge.svg)
+[![GitHub Actions: Build & Deploy](https://github.com/ceptoplex/trillbot-discord/workflows/Build%20&%20Deploy/badge.svg)](https://github.com/ceptoplex/trillbot-discord/actions)
 [![Discord](https://discordapp.com/api/guilds/314010693084905494/widget.png)](https://discord.gg/trilluxe)
-![Twitter: Follow @ceptoplex](https://img.shields.io/twitter/follow/ceptoplex?style=social)
+[![Twitter: Follow @ceptoplex](https://img.shields.io/twitter/follow/ceptoplex?style=social)](https://twitter.com/ceptoplex)
 
 This is a Discord bot that is running on the official [TrilluXe Community](https://discord.gg/trilluxe) server.
 The author of this bot is [ceptoplex](https://twitter.com/ceptoplex) who is also managing the server.
