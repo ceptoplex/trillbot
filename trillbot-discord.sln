@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrillBot.Discord.Modules", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrillBot.Discord.Modules.Ping", "TrillBot.Discord.Modules.Ping\TrillBot.Discord.Modules.Ping.csproj", "{C42BCD1E-BACD-4ECC-A79E-A7237C2FF04B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrillBot.Discord.Modules.ElasticVoiceChannels", "TrillBot.Discord.Modules.ElasticVoiceChannels\TrillBot.Discord.Modules.ElasticVoiceChannels.csproj", "{B2171965-B26E-4DA4-9372-1AF26468416B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{C42BCD1E-BACD-4ECC-A79E-A7237C2FF04B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C42BCD1E-BACD-4ECC-A79E-A7237C2FF04B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C42BCD1E-BACD-4ECC-A79E-A7237C2FF04B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2171965-B26E-4DA4-9372-1AF26468416B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2171965-B26E-4DA4-9372-1AF26468416B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2171965-B26E-4DA4-9372-1AF26468416B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2171965-B26E-4DA4-9372-1AF26468416B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -9,7 +9,13 @@ The author of this bot is [ceptoplex](https://twitter.com/ceptoplex) who is also
 The owner of the server is [TrilluXe](https://twitter.com/trilluxe).
 Found a bug or got an idea idea for a new feature? [Community contributions](https://github.com/ceptoplex/trillbot-discord/blob/master/CONTRIBUTING.md) are possible as well.
 
-## 1. Configuration
+## 1. Features
+
+- __Elastic Voice Channels:__ Voice channels are replicated automatically as soon as users join them.
+  This ensures that there is always one empty voice channel available of each existing type
+  (where different types means different names or different user limits).
+
+## 2. Configuration
 
 All configuration values that do not have any defaults
 and are required to run the application can be found in `appsettings.yml`.
@@ -36,7 +42,7 @@ The translation of configuration keys to environment variable names is documente
 An example would be the system environment variable `TRILLBOT__DISCORD__TOKEN` that sets
 or overwrites the value of the configuration item with the key `Discord:Token`.
 
-## 2. Build & Run
+## 3. Build & Run
 
 To build and run the application in a Linux production environment, use the following commands:
 

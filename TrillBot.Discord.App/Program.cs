@@ -5,6 +5,9 @@ using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TrillBot.Discord.App.Options;
+using TrillBot.Discord.Modules.ElasticVoiceChannels.Extensions;
+using TrillBot.Discord.Modules.ElasticVoiceChannels.Options;
+using TrillBot.Discord.Modules.Options;
 using TrillBot.Discord.Modules.Ping.Extensions;
 
 namespace TrillBot.Discord.App
@@ -57,12 +60,18 @@ namespace TrillBot.Discord.App
             var services = new ServiceCollection();
 
             var discordOptionsSection = _configuration.GetSection(DiscordOptions.Name);
+            var modulesOptionsSection = discordOptionsSection.GetSection(
+                ModulesOptions.Name);
+            var elasticVoiceChannelsOptionsSection = modulesOptionsSection.GetSection(
+                ElasticVoiceChannelsOptions.Name);
+
             services
                 .Configure<DiscordOptions>(DiscordOptions.Name, discordOptionsSection)
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<Bootstrapper>();
             services
-                .AddPingModule();
+                .AddPingModule()
+                .AddElasticVoiceChannelsModule(elasticVoiceChannelsOptionsSection);
 
             return services.BuildServiceProvider();
         }

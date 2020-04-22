@@ -1,5 +1,8 @@
 Discord:
-  Token: ~ # Required (string)
+  Token: ~ # Required: string
+  Modules:
+    ElasticVoiceChannels:
+      ExcludedChannelIds: ~ # Optional: ulong[]
 Logging:
   LogLevel:
     Default: "Debug"
