@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TrillBot.Discord.App.Configuration;
+using TrillBot.Discord.App.Modules;
 
 namespace TrillBot.Discord.App
 {
@@ -33,7 +35,7 @@ namespace TrillBot.Discord.App
                 args.Cancel = true;
                 cancellationTokenSource.Cancel();
             };
-            await _serviceProvider.GetRequiredService<Bot>().RunAsync(cancellationTokenSource.Token);
+            await _serviceProvider.GetRequiredService<Bootstrapper>().RunAsync(cancellationTokenSource.Token);
         }
 
         private static string DetectEnvironment()
@@ -55,9 +57,11 @@ namespace TrillBot.Discord.App
             var services = new ServiceCollection();
 
             var discordOptionsSection = _configuration.GetSection(DiscordOptions.ConfigurationSectionKey);
-            services.Configure<DiscordOptions>(discordOptionsSection);
-
-            services.AddSingleton<Bot>();
+            services
+                .Configure<DiscordOptions>(discordOptionsSection)
+                .AddSingleton<DiscordSocketClient>()
+                .AddSingleton<IModule, PingModule>()
+                .AddSingleton<Bootstrapper>();
 
             return services.BuildServiceProvider();
         }
