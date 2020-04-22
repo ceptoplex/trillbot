@@ -1,6 +1,6 @@
 namespace TrillBot.Discord.App.Configuration
 {
-    public class DiscordOptions
+    internal class DiscordOptions
     {
         public const string ConfigurationSectionKey = "Discord";
 
