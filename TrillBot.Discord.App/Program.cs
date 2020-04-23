@@ -5,7 +5,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TrillBot.Discord.App.Configuration;
-using TrillBot.Discord.App.Modules;
+using TrillBot.Discord.Modules.Ping.Extensions;
 
 namespace TrillBot.Discord.App
 {
@@ -60,8 +60,9 @@ namespace TrillBot.Discord.App
             services
                 .Configure<DiscordOptions>(discordOptionsSection)
                 .AddSingleton<DiscordSocketClient>()
-                .AddSingleton<IModule, PingModule>()
                 .AddSingleton<Bootstrapper>();
+            services
+                .AddPingModule();
 
             return services.BuildServiceProvider();
         }

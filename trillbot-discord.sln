@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrillBot.Discord.App", "TrillBot.Discord.App\TrillBot.Discord.App.csproj", "{3DF97FB8-7D1E-4D44-BBF4-452CC3A61359}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrillBot.Discord.Modules", "TrillBot.Discord.Modules\TrillBot.Discord.Modules.csproj", "{E38C0B0B-070C-4D87-AD2E-AEA4FAD8A49F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrillBot.Discord.Modules.Ping", "TrillBot.Discord.Modules.Ping\TrillBot.Discord.Modules.Ping.csproj", "{C42BCD1E-BACD-4ECC-A79E-A7237C2FF04B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{3DF97FB8-7D1E-4D44-BBF4-452CC3A61359}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3DF97FB8-7D1E-4D44-BBF4-452CC3A61359}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3DF97FB8-7D1E-4D44-BBF4-452CC3A61359}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E38C0B0B-070C-4D87-AD2E-AEA4FAD8A49F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E38C0B0B-070C-4D87-AD2E-AEA4FAD8A49F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E38C0B0B-070C-4D87-AD2E-AEA4FAD8A49F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E38C0B0B-070C-4D87-AD2E-AEA4FAD8A49F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C42BCD1E-BACD-4ECC-A79E-A7237C2FF04B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C42BCD1E-BACD-4ECC-A79E-A7237C2FF04B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C42BCD1E-BACD-4ECC-A79E-A7237C2FF04B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C42BCD1E-BACD-4ECC-A79E-A7237C2FF04B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

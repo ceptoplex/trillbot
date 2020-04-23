@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using TrillBot.Discord.App.Configuration;
 using TrillBot.Discord.App.Extensions;
-using TrillBot.Discord.App.Modules;
+using TrillBot.Discord.Modules;
 
 namespace TrillBot.Discord.App
 {

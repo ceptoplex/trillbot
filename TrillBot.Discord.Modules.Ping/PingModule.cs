@@ -1,6 +1,6 @@
 using Discord.WebSocket;
 
-namespace TrillBot.Discord.App.Modules
+namespace TrillBot.Discord.Modules.Ping
 {
     internal class PingModule : IModule
     {
@@ -16,6 +16,7 @@ namespace TrillBot.Discord.App.Modules
             _discordClient.MessageReceived += async message =>
             {
                 if (message.Content != "!ping") return;
+                if (!((SocketGuildUser) message.Author).GuildPermissions.ManageGuild) return;
                 await message.Channel.SendMessageAsync("pong!");
             };
         }
