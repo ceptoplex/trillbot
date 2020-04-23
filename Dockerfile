@@ -5,6 +5,9 @@ WORKDIR /app
 
 COPY *.sln ./
 COPY ./TrillBot.Discord.App/*.csproj ./TrillBot.Discord.App/
+COPY ./TrillBot.Discord.Modules/*.csproj ./TrillBot.Discord.Modules/
+COPY ./TrillBot.Discord.Modules.ElasticVoiceChannels/*.csproj ./TrillBot.Discord.Modules.ElasticVoiceChannels/
+COPY ./TrillBot.Discord.Modules.Ping/*.csproj ./TrillBot.Discord.Modules.Ping/
 RUN dotnet restore
 
 COPY . ./
