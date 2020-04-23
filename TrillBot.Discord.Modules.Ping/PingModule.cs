@@ -2,7 +2,7 @@ using Discord.WebSocket;
 
 namespace TrillBot.Discord.Modules.Ping
 {
-    internal class PingModule : IModule
+    public class PingModule : IModule
     {
         private readonly DiscordSocketClient _discordClient;
 
