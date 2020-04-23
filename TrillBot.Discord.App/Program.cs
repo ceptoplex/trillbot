@@ -58,7 +58,7 @@ namespace TrillBot.Discord.App
 
             var discordOptionsSection = _configuration.GetSection(DiscordOptions.Name);
             services
-                .Configure<DiscordOptions>(DiscordOptions.Name, discordOptionsSection)
+                .Configure<DiscordOptions>(discordOptionsSection)
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<Bootstrapper>();
             services
