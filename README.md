@@ -49,10 +49,27 @@ To build and run the application in a Linux production environment, use the foll
     ~$ dotnet restore
     ~$ dotnet build
     ~$ set NETCORE_ENVIRONMENT=Production
-    ~$ set TRILLBOT__DISCORD__TOKEN=<token>
+    ~$ set TRILLBOT__DISCORD__TOKEN={token}
     ~$ dotnet run --project=TrillBot.Discord.App
-    
+
  Or else, you can also use the provided `Dockerfile`:
  
     ~$ docker build -t trillbot-discord .
-    ~$ docker run -d -e NETCORE_ENVIRONMENT=Production -e TRILLBOT__DISCORD__TOKEN=<token> trillbot-discord
+    ~$ docker run -d -e NETCORE_ENVIRONMENT=Production -e TRILLBOT__DISCORD__TOKEN={token} trillbot-discord
+
+## 4. Invitation & Discord Permissions
+
+To invite the bot to a server, the following URL can be used (after filling in the value for `client_id`):
+
+    https://discordapp.com/api/oauth2/authorize?client_id={client_id}&permissions=1040&scope=bot
+
+It includes the OAuth2 scopes and bot permissions that are required by the bot:
+
+__Scopes:__
+
+- `bot`
+
+__Bot Permissions:__
+
+- `Manage Channels`
+- `View Channels`
