@@ -1,29 +1,21 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Options;
-using TrillBot.Discord.Modules.ElasticVoiceChannels.Extensions;
 using TrillBot.Discord.Modules.ElasticVoiceChannels.Options;
 
 namespace TrillBot.Discord.Modules.ElasticVoiceChannels
 {
     public class ElasticVoiceChannelModule : IModule
     {
+        private readonly IDictionary<IGuild, Awaiter<ulong>> _channelFixResultAwaiters
+            = new Dictionary<IGuild, Awaiter<ulong>>();
+
         private readonly DiscordSocketClient _discordClient;
-
-        private readonly IDictionary<IGuild, List<IVoiceChannel>> _guildAwaitedChannel
-            = new Dictionary<IGuild, List<IVoiceChannel>>();
-
-        private readonly IDictionary<SocketGuild, IDictionary<IChannel, IList<IVoiceChannel>>> _guildVoiceChannelGroups
-            = new Dictionary<SocketGuild, IDictionary<IChannel, IList<IVoiceChannel>>>();
-
         private readonly ElasticVoiceChannelsOptions _options;
-
-        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1);
 
         public ElasticVoiceChannelModule(
             DiscordSocketClient discordClient,
@@ -35,127 +27,104 @@ namespace TrillBot.Discord.Modules.ElasticVoiceChannels
 
         public void Initialize()
         {
-            _discordClient.Ready += async () =>
+            _discordClient.GuildAvailable += OnGuildAvailable;
+            _discordClient.JoinedGuild += OnGuildAvailable;
+
+            _discordClient.ChannelCreated += OnChannelModified;
+            _discordClient.ChannelDestroyed += OnChannelModified;
+            _discordClient.ChannelUpdated += (oldChannel, newChannel) => OnChannelModified(oldChannel);
+
+            _discordClient.UserVoiceStateUpdated += OnUserVoiceStateUpdated;
+
+            async Task OnGuildAvailable(SocketGuild guild)
             {
-                foreach (var guild in _discordClient.Guilds)
-                    await InitializeGuildAsync(guild);
-            };
-            _discordClient.JoinedGuild += async guild => await InitializeGuildAsync(guild);
-            _discordClient.ChannelCreated += async channel =>
+                _channelFixResultAwaiters[guild] = new Awaiter<ulong>();
+                await FixNextChannelAsync(guild);
+            }
+
+            async Task OnChannelModified(SocketChannel channel)
             {
                 if (!(channel is SocketVoiceChannel))
                     return;
-                var guild = _discordClient.Guilds.First(
-                    _ => _.VoiceChannels.Any(
-                        voiceChannels => voiceChannels.Id == channel.Id));
 
-                await _semaphore.WaitAsync();
-                _guildAwaitedChannel[guild].TryRemoveFirst(_ => _.Id == channel.Id);
-                _semaphore.Release();
+                var guild = ((SocketGuildChannel) channel).Guild;
+                await _channelFixResultAwaiters[guild].StopWaitingForAsync(channel.Id);
+                await FixNextChannelAsync(guild);
+            }
 
-                await UpdateVoiceChannelGroupsAsync(guild);
-            };
-            _discordClient.ChannelDestroyed += async channel =>
-            {
-                if (!(channel is SocketVoiceChannel voiceChannel))
-                    return;
-                var guild = _guildVoiceChannelGroups.First(
-                    voiceChannelGroup => voiceChannelGroup.Value.Any(
-                        voiceChannels => voiceChannels.Value.Any(
-                            _ => _.Id == voiceChannel.Id))).Key;
-
-                await _semaphore.WaitAsync();
-                _guildAwaitedChannel[guild].TryRemoveFirst(_ => _.Id == channel.Id);
-                _semaphore.Release();
-
-                await UpdateVoiceChannelGroupsAsync(guild);
-            };
-            _discordClient.ChannelUpdated += async (oldChannel, newChannel) =>
-            {
-                if (!(oldChannel is SocketVoiceChannel) && !(newChannel is SocketVoiceChannel))
-                    return;
-                var guild = _discordClient.Guilds.First(
-                    _ => _.VoiceChannels.Any(
-                        voiceChannels => voiceChannels.Id == newChannel.Id));
-
-                await _semaphore.WaitAsync();
-                _guildAwaitedChannel[guild].TryRemoveFirst(_ => _.Id == oldChannel.Id);
-                _semaphore.Release();
-
-                await UpdateVoiceChannelGroupsAsync(guild);
-            };
-            _discordClient.UserVoiceStateUpdated += async (user, oldState, newState) =>
+            async Task OnUserVoiceStateUpdated(SocketUser user, SocketVoiceState oldState, SocketVoiceState newState)
             {
                 if (newState.VoiceChannel != null &&
                     oldState.VoiceChannel != null &&
                     newState.VoiceChannel.Id == oldState.VoiceChannel.Id)
                     return;
-                var stateVoiceChannel = newState.VoiceChannel ?? oldState.VoiceChannel;
-                var guild = _discordClient.Guilds.First(
-                    _ => _.VoiceChannels.Any(
-                        voiceChannel => voiceChannel.Id == stateVoiceChannel.Id));
 
-                await UpdateVoiceChannelGroupsAsync(guild);
-            };
+                var channel = newState.VoiceChannel ?? oldState.VoiceChannel;
+                await FixNextChannelAsync(channel.Guild);
+            }
         }
 
-        private async Task InitializeGuildAsync(SocketGuild guild)
+        private async Task FixNextChannelAsync(SocketGuild guild)
         {
-            _guildAwaitedChannel[guild] = new List<IVoiceChannel>();
-            await UpdateVoiceChannelGroupsAsync(guild);
-        }
-
-        private async Task UpdateVoiceChannelGroupsAsync(SocketGuild guild)
-        {
-            if (_guildAwaitedChannel[guild].Any())
+            if (_channelFixResultAwaiters[guild].CurrentlyWaiting)
+                // We are still waiting for the result of another fix.
                 return;
 
-            _guildVoiceChannelGroups[guild] = new Dictionary<IChannel, IList<IVoiceChannel>>();
-            IVoiceChannel currentVoiceChannelGroup = null;
-            string currentVoiceChannelGroupName = null;
-            foreach (var voiceChannel in guild.VoiceChannels.OrderBy(_ => _.Position))
-            {
-                if (_options.ExcludedChannelIds?.Contains(voiceChannel.Id) ?? false)
-                {
-                    currentVoiceChannelGroup = null;
-                    currentVoiceChannelGroupName = null;
-                    continue;
-                }
-
-                var (voiceChannelName, _) = ParseChannelName(voiceChannel);
-
-                if (currentVoiceChannelGroup != null &&
-                    voiceChannelName == currentVoiceChannelGroupName &&
-                    voiceChannel.Bitrate == currentVoiceChannelGroup.Bitrate &&
-                    voiceChannel.CategoryId == currentVoiceChannelGroup.CategoryId &&
-                    voiceChannel.UserLimit == currentVoiceChannelGroup.UserLimit)
-                {
-                    _guildVoiceChannelGroups[guild][currentVoiceChannelGroup].Add(voiceChannel);
-                    continue;
-                }
-
-                currentVoiceChannelGroup = voiceChannel;
-                currentVoiceChannelGroupName = voiceChannelName;
-                _guildVoiceChannelGroups[guild][currentVoiceChannelGroup] = new List<IVoiceChannel> {voiceChannel};
-            }
-
-            if (await RemoveNextUnnecessaryVoiceChannelAsync(guild)) return;
-            if (await AddNextRequiredVoiceChannelAsync(guild)) return;
-            await FixNextVoiceChannelIndexErrorAsync(guild);
+            // We only fix the next issue, so if one method returns with a successful initiated fix,
+            // we stop doing more work. Further fixes are triggered by the resulting events
+            // of the currently applied fix.
+            if (await FixNextUnnecessaryChannelAsync(guild)) return;
+            if (await FixNextMissingChannelAsync(guild)) return;
+            await FixNextIncorrectChannelNameAsync(guild);
         }
 
-        private async Task<bool> RemoveNextUnnecessaryVoiceChannelAsync(SocketGuild guild)
+        private ChannelGroups<SocketVoiceChannel> GetChannelGroupsForElasticity(SocketGuild guild)
         {
-            foreach (var voiceChannels in _guildVoiceChannelGroups[guild].Values)
+            return GetChannelGroups(
+                guild,
+                (channelA, channelB) =>
+                    IndexedChannelName.Create(channelA).Name ==
+                    IndexedChannelName.Create(channelB).Name &&
+                    channelA.Bitrate == channelB.Bitrate &&
+                    channelA.CategoryId == channelB.CategoryId &&
+                    channelA.UserLimit == channelB.UserLimit);
+        }
+
+        private ChannelGroups<SocketVoiceChannel> GetChannelGroupsForIndexing(SocketGuild guild)
+        {
+            return GetChannelGroups(
+                guild,
+                (channelA, channelB) =>
+                    IndexedChannelName.Create(channelA).Name ==
+                    IndexedChannelName.Create(channelB).Name);
+        }
+
+        private ChannelGroups<SocketVoiceChannel> GetChannelGroups(
+            SocketGuild guild,
+            Func<IVoiceChannel, IVoiceChannel, bool> channelsEqual)
+        {
+            return ChannelGroups<SocketVoiceChannel>.CreateFrom(
+                guild.VoiceChannels.OrderBy(_ => _.Position),
+                channel => _options.ExcludedChannelIds?.Contains(channel.Id) ?? false,
+                channelsEqual);
+        }
+
+        private async Task<bool> FixNextUnnecessaryChannelAsync(SocketGuild guild)
+        {
+            foreach (var channels in GetChannelGroupsForElasticity(guild).GetGroupsChannels())
             {
-                var emptyVoiceChannels = voiceChannels
-                    .Where(_ => ((SocketVoiceChannel) _).Users.Count == 0)
+                var emptyChannels = channels
+                    .Where(_ => _.Users.Count == 0)
                     .ToList();
-                if (emptyVoiceChannels.Count < 2)
+                if (emptyChannels.Count <= 1)
                     continue;
 
-                _guildAwaitedChannel[guild].Add(emptyVoiceChannels.Last());
-                await emptyVoiceChannels.Last().DeleteAsync();
+                await _channelFixResultAwaiters[guild].WaitForAsync(async () =>
+                {
+                    var channel = emptyChannels.Last();
+                    await channel.DeleteAsync();
+                    return channel.Id;
+                });
 
                 return true;
             }
@@ -163,104 +132,110 @@ namespace TrillBot.Discord.Modules.ElasticVoiceChannels
             return false;
         }
 
-        private async Task<bool> AddNextRequiredVoiceChannelAsync(SocketGuild guild)
+        private async Task<bool> FixNextMissingChannelAsync(SocketGuild guild)
         {
-            foreach (var voiceChannels in _guildVoiceChannelGroups[guild].Values)
+            foreach (var channels in GetChannelGroupsForElasticity(guild).GetGroupsChannels())
             {
-                if (voiceChannels.Count >= 10)
-                    // This is a fail-safe circuit to stop the creation of new channels if anything unforeseen happens.
+                var maxGroupChannelCount = _options.MaxGroupChannelCount;
+                if (maxGroupChannelCount.HasValue && channels.Count >= maxGroupChannelCount)
                     continue;
 
-                var emptyVoiceChannels = voiceChannels
-                    .Where(_ => ((SocketVoiceChannel) _).Users.Count == 0)
+                var emptyChannels = channels
+                    .Where(_ => _.Users.Count == 0)
                     .ToList();
-                if (emptyVoiceChannels.Count > 0)
+                if (emptyChannels.Count > 0)
                     continue;
-                var (name, _) = ParseChannelName(voiceChannels.First());
 
-                await _semaphore.WaitAsync();
+                await _channelFixResultAwaiters[guild].WaitForAsync(() =>
+                    CreateChannelAsync(channels));
 
-                var allExceptCreatedVoiceChannels = guild.VoiceChannels
-                    .OrderBy(_ => _.Position)
-                    .ToList();
+                return true;
+            }
 
-                var createdVoiceChannel = await guild.CreateVoiceChannelAsync(
-                    $"{name} ({voiceChannels.Count + 1})");
-                _guildAwaitedChannel[guild].Add(createdVoiceChannel);
+            return false;
 
-                _guildAwaitedChannel[guild].Add(createdVoiceChannel);
-                await createdVoiceChannel.ModifyAsync(
+            async IAsyncEnumerable<ulong> CreateChannelAsync(ICollection<SocketVoiceChannel> channels)
+            {
+                var groupBaseChannel = channels.First();
+
+                // Create the channel.
+                var createdChannel = await guild.CreateVoiceChannelAsync(
+                    IndexedChannelName.CreateWithGroupContext(
+                        groupBaseChannel,
+                        channels.Count,
+                        channels.Count + 1).Format());
+                yield return createdChannel.Id;
+
+                // Copy channel properties from group's base channel to newly created channel.
+                await createdChannel.ModifyAsync(
                     properties =>
                     {
-                        var voiceChannel = voiceChannels.First();
-                        properties.Bitrate = voiceChannel.Bitrate;
-                        properties.CategoryId = voiceChannel.CategoryId;
-                        properties.UserLimit = voiceChannel.UserLimit;
+                        properties.Bitrate = groupBaseChannel.Bitrate;
+                        properties.CategoryId = groupBaseChannel.CategoryId;
+                        properties.UserLimit = groupBaseChannel.UserLimit;
                     });
+                yield return createdChannel.Id;
 
-                var reorderedVoiceChannels = allExceptCreatedVoiceChannels
-                    .TakeWhile(_ => _.Id != voiceChannels.Last().Id)
-                    .Append(voiceChannels.Last())
-                    .Append(createdVoiceChannel)
+                // Calculate the list of channels with the newly created one inserted at the correct position.
+                var allExceptCreatedChannels = guild.VoiceChannels
+                    .OrderBy(_ => _.Position)
+                    .Where(_ => _.Id != createdChannel.Id)
+                    .ToList<IVoiceChannel>();
+                var groupPreviouslyLastChannel = channels.Last();
+                var allChannels = allExceptCreatedChannels
+                    // All channels before the newly created one.
+                    .TakeWhile(_ => _.Id != groupPreviouslyLastChannel.Id)
+                    .Append(groupPreviouslyLastChannel)
+                    // The newly created channel.
+                    .Append(createdChannel)
+                    // All channels after the newly created one.
                     .Concat(
-                        allExceptCreatedVoiceChannels
-                            .SkipWhile(_ => _.Id != voiceChannels.Last().Id)
-                            .Skip(1))
-                    .Select((_, i) => (Index: i, Element: _))
-                    .Where(_ => _.Element.Position != _.Index)
-                    .ToList();
-                _guildAwaitedChannel[guild].AddRange(
-                    reorderedVoiceChannels
-                        .Select(_ => _.Element));
-                await guild.ReorderChannelsAsync(
-                    reorderedVoiceChannels
-                        .Select(_ => new ReorderChannelProperties(_.Element.Id, _.Index)));
+                        allExceptCreatedChannels
+                            .SkipWhile(_ => _.Id != groupPreviouslyLastChannel.Id)
+                            .Skip(1));
 
-                _semaphore.Release();
+                // Reorder channels that are not in the correct order after including the newly created one.
+                var reorderedChannels = allChannels
+                    .Select((_, i) => (index: i, channel: _))
+                    .Where(_ => _.channel.Position != _.index)
+                    .ToList();
+                await guild.ReorderChannelsAsync(reorderedChannels
+                    .Select(_ => new ReorderChannelProperties(_.channel.Id, _.index)));
+                foreach (var channel in reorderedChannels
+                    .Select(_ => _.channel))
+                    yield return channel.Id;
+            }
+        }
+
+        private async Task<bool> FixNextIncorrectChannelNameAsync(SocketGuild guild)
+        {
+            foreach (var (channel, groupIndex, groupCount) in GetChannelGroupsForIndexing(guild)
+                .GetGroupsChannels()
+                .Select(channels => channels
+                    .Select((channel, i) => (
+                        channel,
+                        groupIndex: i,
+                        groupCount: channels.Count)))
+                .SelectMany(_ => _))
+            {
+                var existingChannelName = IndexedChannelName.Create(channel);
+                var correctChannelName = IndexedChannelName.CreateWithGroupContext(
+                    channel,
+                    groupIndex,
+                    groupCount);
+                if (existingChannelName == correctChannelName)
+                    continue;
+
+                await _channelFixResultAwaiters[guild].WaitForAsync(async () =>
+                {
+                    await channel.ModifyAsync(properties => properties.Name = correctChannelName.Format());
+                    return channel.Id;
+                });
 
                 return true;
             }
 
             return false;
-        }
-
-        private async Task<bool> FixNextVoiceChannelIndexErrorAsync(SocketGuild guild)
-        {
-            foreach (var voiceChannels in _guildVoiceChannelGroups[guild].Values
-                .SelectMany(_ => _)
-                .Select(
-                    _ =>
-                    {
-                        var (name, index) = ParseChannelName(_);
-                        return (Name: name, Index: index, Channel: _);
-                    })
-                .GroupBy(_ => _.Name)
-                .Select(_ => _.ToList()))
-                for (var i = 0; i < voiceChannels.Count; i++)
-                {
-                    if (voiceChannels.Count == 1 && i == 0 && voiceChannels[i].Index == null ||
-                        (voiceChannels.Count > 1 || i > 0) && voiceChannels[i].Index == i + 1)
-                        continue;
-
-                    _guildAwaitedChannel[guild].Add(voiceChannels[i].Channel);
-                    var indexString = voiceChannels.Count > 1 || i > 0
-                        ? $" ({i + 1})"
-                        : "";
-                    await voiceChannels[i].Channel.ModifyAsync(
-                        properties => properties.Name = $"{voiceChannels[i].Name}{indexString}");
-
-                    return true;
-                }
-
-            return false;
-        }
-
-        private static (string Name, int? Index) ParseChannelName(IChannel channel)
-        {
-            var match = Regex.Match(channel.Name, @"^(?<name>.+?)( \((?<index>\d+)\))?$");
-            var name = match.Groups["name"].Value;
-            var index = match.Groups["index"].Success ? int.Parse(match.Groups["index"].Value) : (int?) null;
-            return (name, index);
         }
     }
 }

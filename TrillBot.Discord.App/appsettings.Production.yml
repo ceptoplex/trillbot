@@ -1,0 +1,4 @@
+Discord:
+  Modules:
+    ElasticVoiceChannels:
+      MaxGroupChannelCount: 10
