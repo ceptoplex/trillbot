@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TrillBot.Discord.App.Configuration;
+using TrillBot.Discord.App.Options;
 using TrillBot.Discord.Modules.Ping.Extensions;
 
 namespace TrillBot.Discord.App
@@ -56,9 +56,9 @@ namespace TrillBot.Discord.App
         {
             var services = new ServiceCollection();
 
-            var discordOptionsSection = _configuration.GetSection(DiscordOptions.ConfigurationSectionKey);
+            var discordOptionsSection = _configuration.GetSection(DiscordOptions.Name);
             services
-                .Configure<DiscordOptions>(discordOptionsSection)
+                .Configure<DiscordOptions>(DiscordOptions.Name, discordOptionsSection)
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<Bootstrapper>();
             services

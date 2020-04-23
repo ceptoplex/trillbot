@@ -6,8 +6,8 @@ using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using TrillBot.Discord.App.Configuration;
 using TrillBot.Discord.App.Extensions;
+using TrillBot.Discord.App.Options;
 using TrillBot.Discord.Modules;
 
 namespace TrillBot.Discord.App
