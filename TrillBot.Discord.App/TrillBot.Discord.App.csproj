@@ -24,10 +24,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Modules"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\TrillBot.Discord.Modules.Ping\TrillBot.Discord.Modules.Ping.csproj"/>
         <ProjectReference Include="..\TrillBot.Discord.Modules\TrillBot.Discord.Modules.csproj"/>
     </ItemGroup>
