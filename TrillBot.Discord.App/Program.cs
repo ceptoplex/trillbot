@@ -66,7 +66,7 @@ namespace TrillBot.Discord.App
                 ElasticVoiceChannelsOptions.Name);
 
             services
-                .Configure<DiscordOptions>(DiscordOptions.Name, discordOptionsSection)
+                .Configure<DiscordOptions>(discordOptionsSection)
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<Bootstrapper>();
             services

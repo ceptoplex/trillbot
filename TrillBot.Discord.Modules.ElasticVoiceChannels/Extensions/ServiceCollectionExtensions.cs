@@ -21,7 +21,7 @@ namespace TrillBot.Discord.Modules.ElasticVoiceChannels.Extensions
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.Configure<ElasticVoiceChannelsOptions>(ElasticVoiceChannelsOptions.Name, configuration);
+            services.Configure<ElasticVoiceChannelsOptions>(configuration);
             services.AddSingleton<IModule, ElasticVoiceChannelModule>();
 
             return services;
