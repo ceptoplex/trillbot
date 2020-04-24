@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using TrillBot.Discord.App.Extensions;
 using TrillBot.Discord.App.Options;
 using TrillBot.Discord.Modules.Ping.Extensions;
 
@@ -56,11 +57,22 @@ namespace TrillBot.Discord.App
         {
             var services = new ServiceCollection();
 
-            var discordOptionsSection = _configuration.GetSection(DiscordOptions.Name);
+            // Logging
+            var loggingSection = _configuration.GetSection(
+                "Logging");
             services
-                .Configure<DiscordOptions>(discordOptionsSection)
-                .AddSingleton<DiscordSocketClient>()
-                .AddSingleton<Bootstrapper>();
+                .AddLogging(builder =>
+                {
+                    builder.AddConfiguration(loggingSection);
+                    builder.AddConsole();
+                });
+
+            // Bot
+            var discordSection = _configuration.GetSection(
+                DiscordOptions.Name);
+            services.AddBootstrapper(discordSection);
+
+            // Bot: Modules
             services
                 .AddPingModule();
 
