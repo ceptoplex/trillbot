@@ -61,9 +61,9 @@ To build and run the application in a Linux production environment, use the foll
 
 To invite the bot to a server, the following URL can be used (after filling in the value for `client_id`):
 
-    https://discordapp.com/api/oauth2/authorize?client_id={client_id}&permissions=1040&scope=bot
+    https://discordapp.com/api/oauth2/authorize?client_id={client_id}&permissions=268438544&scope=bot
 
-It includes the OAuth2 scopes and bot permissions that are required by the bot:
+It includes the OAuth2 scopes and the permissions that are required by the bot:
 
 __Scopes:__
 
@@ -71,5 +71,7 @@ __Scopes:__
 
 __Bot Permissions:__
 
+- `Manage Roles`
 - `Manage Channels`
 - `View Channels`
+- `Send Messages`

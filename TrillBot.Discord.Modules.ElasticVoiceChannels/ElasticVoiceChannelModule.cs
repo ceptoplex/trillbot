@@ -163,11 +163,7 @@ namespace TrillBot.Discord.Modules.ElasticVoiceChannels
                     IndexedChannelName.CreateWithGroupContext(
                         groupBaseChannel,
                         channels.Count,
-                        channels.Count + 1).Format());
-                yield return createdChannel.Id;
-
-                // Copy channel properties from group's base channel to newly created channel.
-                await createdChannel.ModifyAsync(
+                        channels.Count + 1).Format(),
                     properties =>
                     {
                         properties.Bitrate = groupBaseChannel.Bitrate;
@@ -175,6 +171,30 @@ namespace TrillBot.Discord.Modules.ElasticVoiceChannels
                         properties.UserLimit = groupBaseChannel.UserLimit;
                     });
                 yield return createdChannel.Id;
+
+                // Copy permissions to newly created channel.
+                foreach (var overwrite in groupBaseChannel.PermissionOverwrites)
+                {
+                    if (createdChannel.PermissionOverwrites.Contains(overwrite)) continue;
+
+                    switch (overwrite.TargetType)
+                    {
+                        case PermissionTarget.Role:
+                            await createdChannel.AddPermissionOverwriteAsync(
+                                guild.GetRole(overwrite.TargetId),
+                                overwrite.Permissions);
+                            break;
+                        case PermissionTarget.User:
+                            await createdChannel.AddPermissionOverwriteAsync(
+                                _discordClient.GetUser(overwrite.TargetId),
+                                overwrite.Permissions);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+
+                    yield return createdChannel.Id;
+                }
 
                 // Calculate the list of channels with the newly created one inserted at the correct position.
                 var allExceptCreatedChannels = guild.VoiceChannels
