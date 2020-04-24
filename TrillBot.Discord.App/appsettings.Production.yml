@@ -1,0 +1,6 @@
+Discord:
+  Modules:
+    ElasticVoiceChannels:
+      ExcludedChannelIds:
+        - 321976095886934026 # Lobby
+      MaxGroupChannelCount: 10

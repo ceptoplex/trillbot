@@ -6,6 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TrillBot.Discord.App.Extensions;
 using TrillBot.Discord.App.Options;
+using TrillBot.Discord.Modules.ElasticVoiceChannels.Extensions;
+using TrillBot.Discord.Modules.ElasticVoiceChannels.Options;
+using TrillBot.Discord.Modules.Options;
 using TrillBot.Discord.Modules.Ping.Extensions;
 
 namespace TrillBot.Discord.App
@@ -73,8 +76,14 @@ namespace TrillBot.Discord.App
             services.AddBootstrapper(discordSection);
 
             // Bot: Modules
+
+            var modulesSection = discordSection.GetSection(
+                ModulesOptions.Name);
+            var elasticVoiceChannelsSection = modulesSection.GetSection(
+                ElasticVoiceChannelsOptions.Name);
             services
-                .AddPingModule();
+                .AddPingModule()
+                .AddElasticVoiceChannelsModule(elasticVoiceChannelsSection);
 
             return services.BuildServiceProvider();
         }
