@@ -6,6 +6,5 @@ Discord:
       MaxGroupChannelCount: ~ # Optional: number
 Logging:
   LogLevel:
-    Default: "Debug"
-    System: "Information"
-    Microsoft: "Information"
+    Default: "Information"
+    # Optional: Log levels for other namespace prefixes.

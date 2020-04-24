@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using TrillBot.Discord.App.Extensions;
 using TrillBot.Discord.App.Options;
 using TrillBot.Discord.Modules.ElasticVoiceChannels.Extensions;
 using TrillBot.Discord.Modules.ElasticVoiceChannels.Options;
@@ -59,19 +60,30 @@ namespace TrillBot.Discord.App
         {
             var services = new ServiceCollection();
 
-            var discordOptionsSection = _configuration.GetSection(DiscordOptions.Name);
-            var modulesOptionsSection = discordOptionsSection.GetSection(
-                ModulesOptions.Name);
-            var elasticVoiceChannelsOptionsSection = modulesOptionsSection.GetSection(
-                ElasticVoiceChannelsOptions.Name);
-
+            // Logging
+            var loggingSection = _configuration.GetSection(
+                "Logging");
             services
-                .Configure<DiscordOptions>(discordOptionsSection)
-                .AddSingleton<DiscordSocketClient>()
-                .AddSingleton<Bootstrapper>();
+                .AddLogging(builder =>
+                {
+                    builder.AddConfiguration(loggingSection);
+                    builder.AddConsole();
+                });
+
+            // Bot
+            var discordSection = _configuration.GetSection(
+                DiscordOptions.Name);
+            services.AddBootstrapper(discordSection);
+
+            // Bot: Modules
+
+            var modulesSection = discordSection.GetSection(
+                ModulesOptions.Name);
+            var elasticVoiceChannelsSection = modulesSection.GetSection(
+                ElasticVoiceChannelsOptions.Name);
             services
                 .AddPingModule()
-                .AddElasticVoiceChannelsModule(elasticVoiceChannelsOptionsSection);
+                .AddElasticVoiceChannelsModule(elasticVoiceChannelsSection);
 
             return services.BuildServiceProvider();
         }
