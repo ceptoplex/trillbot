@@ -26,7 +26,7 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: trillbot-discord
+          ECR_REPOSITORY: trillbot
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
@@ -58,7 +58,7 @@ jobs:
         id: build-image-name
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: trillbot-discord
+          ECR_REPOSITORY: trillbot
           IMAGE_TAG: ${{ github.sha }}
         run: |
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
@@ -67,14 +67,14 @@ jobs:
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: task-definition.json
-          container-name: trillbot-discord
+          task-definition: deploy/task-definition.json
+          container-name: trillbot
           image: ${{ steps.build-image-name.outputs.image }}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: trillbot-discord
+          service: trillbot
           cluster: default
           wait-for-service-stability: true

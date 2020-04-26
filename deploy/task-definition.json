@@ -1,0 +1,37 @@
+{
+  "family": "trillbot",
+  "containerDefinitions": [
+    {
+      "name": "trillbot",
+      "environment": [
+        {
+          "name": "NETCORE_ENVIRONMENT",
+          "value": "Production"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "TRILLBOT__DISCORD__TOKEN",
+          "valueFrom": "arn:aws:ssm:eu-central-1:528655409007:parameter/trillbot_discord-token"
+        }
+      ],
+      "memory": 512,
+      "memoryReservation": 512,
+      "cpu": 256,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/trillbot",
+          "awslogs-region": "eu-central-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "memory": "512",
+  "cpu": "256",
+  "requiresCompatibilities": [
+    "EC2"
+  ],
+  "executionRoleArn": "arn:aws:iam::528655409007:role/ECS-TaskExecution"
+}
