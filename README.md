@@ -11,6 +11,8 @@ Found a bug or got an idea idea for a new feature? [Community contributions](htt
 
 ## 1. Features
 
+- __Anti-Abuse:__ Different types of abuse are detected and mitigated.
+    - Users that try to impersonate the bot are kicked from the server.
 - __Elastic Voice Channels:__ Voice channels are replicated automatically as soon as users join them.
   This ensures that there is always one empty voice channel available of each existing type
   (where different types means different names or different user limits).
