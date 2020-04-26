@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <data name="YouWereKicked" xml:space="preserve">
+        <value>Du wurdest von mir vom Server `{0}` gekickt, weil dein Name `{1}` zu ähnlich zu meinem eigenen ist.
+Mit derartigen Maßnahmen soll verhindert werden, dass jemand meine Identität stiehlt.
+Bevor du dem Server wieder beitrittst, ändere bitte deinen Namen entsprechend ab.</value>
+    </data>
+    <data name="UserWasKicked" xml:space="preserve">
+        <value>Servermitglied {0} wurde gekickt, weil dessen Name `{1}` zu ähnlich zu dem von {2} ist.</value>
+    </data>
+    <data name="UserWasNotified" xml:space="preserve">
+        <value>Der Nutzer wurde per DM darüber informiert.</value>
+    </data>
+    <data name="UserWasNotNotified" xml:space="preserve">
+        <value>Aufgrund seiner Privatsphäre-Einstellungen konnte der Nutzer nicht per DM darüber informiert werden.</value>
+    </data>
+    <data name="UserKickReason" xml:space="preserve">
+        <value>Benutzername '{0}' ist zu ähnlich zu '{1}'.</value>
+    </data>
+</root>
