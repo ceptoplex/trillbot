@@ -1,9 +1,9 @@
 using Discord;
 using Microsoft.Extensions.Logging;
 
-namespace TrillBot.Discord.App.Extensions
+namespace TrillBot.Discord.Extensions
 {
-    public static class LogSeverityExtensions
+    internal static class LogSeverityExtensions
     {
         public static LogLevel ToLogLevel(this LogSeverity logSeverity)
         {

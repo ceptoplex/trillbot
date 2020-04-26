@@ -1,8 +1,8 @@
 {
-  "family": "trillbot-discord",
+  "family": "trillbot",
   "containerDefinitions": [
     {
-      "name": "trillbot-discord",
+      "name": "trillbot",
       "environment": [
         {
           "name": "NETCORE_ENVIRONMENT",
@@ -12,7 +12,7 @@
       "secrets": [
         {
           "name": "TRILLBOT__DISCORD__TOKEN",
-          "valueFrom": "arn:aws:ssm:eu-central-1:528655409007:parameter/trillbot-discord_discord-token"
+          "valueFrom": "arn:aws:ssm:eu-central-1:528655409007:parameter/trillbot_discord-token"
         }
       ],
       "memory": 512,
@@ -21,7 +21,7 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/trillbot-discord",
+          "awslogs-group": "/ecs/trillbot",
           "awslogs-region": "eu-central-1",
           "awslogs-stream-prefix": "ecs"
         }

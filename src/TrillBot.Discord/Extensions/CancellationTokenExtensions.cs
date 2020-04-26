@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TrillBot.Discord.App.Extensions
+namespace TrillBot.Discord.Extensions
 {
     internal static class CancellationTokenExtensions
     {

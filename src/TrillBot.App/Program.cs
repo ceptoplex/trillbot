@@ -5,16 +5,18 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using TrillBot.Discord.App.Extensions;
-using TrillBot.Discord.App.Options;
+using TrillBot.App.Options.Discord;
+using TrillBot.Discord;
+using TrillBot.Discord.Extensions;
 using TrillBot.Discord.Modules.AntiAbuse.Extensions;
 using TrillBot.Discord.Modules.ElasticVoiceChannels.Extensions;
 using TrillBot.Discord.Modules.ElasticVoiceChannels.Options;
 using TrillBot.Discord.Modules.Extensions;
 using TrillBot.Discord.Modules.Options;
 using TrillBot.Discord.Modules.Ping.Extensions;
+using TrillBot.Discord.Options;
 
-namespace TrillBot.Discord.App
+namespace TrillBot.App
 {
     internal class Program
     {
@@ -42,7 +44,9 @@ namespace TrillBot.Discord.App
                 args.Cancel = true;
                 cancellationTokenSource.Cancel();
             };
-            await _serviceProvider.GetRequiredService<Bootstrapper>().RunAsync(cancellationTokenSource.Token);
+            await _serviceProvider
+                .GetRequiredService<DiscordBot<DiscordModulesOptions>>()
+                .RunAsync(cancellationTokenSource.Token);
         }
 
         private static string DetectEnvironment()
@@ -82,23 +86,25 @@ namespace TrillBot.Discord.App
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
 
-            // Bot
-            var discordSection = _configuration.GetSection(
-                DiscordOptions.Name);
-            services.AddBootstrapper(discordSection);
-
-            // Bot: Modules
-            var modulesSection = discordSection.GetSection(
-                ModulesOptions.Name);
-            var elasticVoiceChannelsSection = modulesSection.GetSection(
-                ElasticVoiceChannelsOptions.Name);
-            services
-                .AddModules(modulesSection)
-                .AddAntiAbuseModule()
-                .AddElasticVoiceChannelsModule(elasticVoiceChannelsSection)
-                .AddPingModule();
+            ConfigureDiscordServices(services);
 
             return services.BuildServiceProvider();
+        }
+
+        private void ConfigureDiscordServices(IServiceCollection services)
+        {
+            // Bot
+            var discordSection = _configuration.GetSection(DiscordOptions<DiscordModulesOptions>.Name);
+            services.AddDiscordBot<DiscordModulesOptions>(discordSection);
+
+            // Bot: Modules
+            var modulesSection = discordSection.GetSection(ModulesOptions.Name);
+            var elasticVoiceChannelsSection = modulesSection.GetSection(ElasticVoiceChannelsOptions.Name);
+            services
+                .AddDiscordModules(modulesSection)
+                .AddAntiAbuseDiscordModule()
+                .AddElasticVoiceChannelsDiscordModule(elasticVoiceChannelsSection)
+                .AddPingDiscordModule();
         }
 
         internal static async Task Main()

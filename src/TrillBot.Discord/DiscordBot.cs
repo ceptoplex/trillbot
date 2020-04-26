@@ -7,24 +7,26 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using TrillBot.Discord.App.Extensions;
-using TrillBot.Discord.App.Options;
+using TrillBot.Discord.Extensions;
 using TrillBot.Discord.Modules;
+using TrillBot.Discord.Modules.Options;
+using TrillBot.Discord.Options;
 
-namespace TrillBot.Discord.App
+namespace TrillBot.Discord
 {
-    internal class Bootstrapper
+    public class DiscordBot<TModulesOptions>
+        where TModulesOptions : ModulesOptions
     {
         private readonly DiscordSocketClient _discordClient;
-        private readonly DiscordOptions _discordOptions;
-        private readonly ILogger<Bootstrapper> _logger;
+        private readonly DiscordOptions<TModulesOptions> _discordOptions;
+        private readonly ILogger<DiscordBot<TModulesOptions>> _logger;
         private readonly IServiceProvider _serviceProvider;
 
-        public Bootstrapper(
+        public DiscordBot(
             DiscordSocketClient discordClient,
-            IOptions<DiscordOptions> discordOptions,
+            IOptions<DiscordOptions<TModulesOptions>> discordOptions,
             IServiceProvider serviceProvider,
-            ILogger<Bootstrapper> logger)
+            ILogger<DiscordBot<TModulesOptions>> logger)
         {
             _discordClient = discordClient;
             _serviceProvider = serviceProvider;

@@ -7,7 +7,7 @@ namespace TrillBot.Discord.Modules.ElasticVoiceChannels.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddElasticVoiceChannelsModule(
+        public static IServiceCollection AddElasticVoiceChannelsDiscordModule(
             this IServiceCollection services,
             Action<ElasticVoiceChannelsOptions> configureOptions)
         {
@@ -17,7 +17,7 @@ namespace TrillBot.Discord.Modules.ElasticVoiceChannels.Extensions
             return services;
         }
 
-        public static IServiceCollection AddElasticVoiceChannelsModule(
+        public static IServiceCollection AddElasticVoiceChannelsDiscordModule(
             this IServiceCollection services,
             IConfiguration configuration)
         {

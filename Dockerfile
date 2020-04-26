@@ -3,12 +3,13 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build-env
 WORKDIR /app
 
-COPY *.sln ./
-COPY ./TrillBot.Discord.App/*.csproj ./TrillBot.Discord.App/
-COPY ./TrillBot.Discord.Modules/*.csproj ./TrillBot.Discord.Modules/
-COPY ./TrillBot.Discord.Modules.AntiAbuse/*.csproj ./TrillBot.Discord.Modules.AntiAbuse/
-COPY ./TrillBot.Discord.Modules.ElasticVoiceChannels/*.csproj ./TrillBot.Discord.Modules.ElasticVoiceChannels/
-COPY ./TrillBot.Discord.Modules.Ping/*.csproj ./TrillBot.Discord.Modules.Ping/
+COPY ./*.sln ./
+COPY ./src/TrillBot.App/*.csproj ./src/TrillBot.App/
+COPY ./src/TrillBot.Discord/*.csproj ./src/TrillBot.Discord/
+COPY ./src/TrillBot.Discord.Modules/*.csproj ./src/TrillBot.Discord.Modules/
+COPY ./src/TrillBot.Discord.Modules.AntiAbuse/*.csproj ./src/TrillBot.Discord.Modules.AntiAbuse/
+COPY ./src/TrillBot.Discord.Modules.ElasticVoiceChannels/*.csproj ./src/TrillBot.Discord.Modules.ElasticVoiceChannels/
+COPY ./src/TrillBot.Discord.Modules.Ping/*.csproj ./src/TrillBot.Discord.Modules.Ping/
 RUN dotnet restore
 
 COPY . ./
@@ -20,4 +21,4 @@ FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
 WORKDIR /app
 
 COPY --from=build-env /app/out .
-ENTRYPOINT ["dotnet", "TrillBot.Discord.App.dll"]
+ENTRYPOINT ["dotnet", "TrillBot.App.dll"]
