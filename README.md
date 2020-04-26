@@ -60,7 +60,7 @@ To build and run the application in a Linux production environment, use the foll
     ~$ dotnet build
     ~$ set NETCORE_ENVIRONMENT=Production
     ~$ set TRILLBOT__DISCORD__TOKEN={token}
-    ~$ dotnet run --project=TrillBot.App
+    ~$ dotnet run --project=src/TrillBot.App
 
  Or else, you can also use the provided `Dockerfile`:
  
