@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -6,8 +7,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TrillBot.Discord.App.Extensions;
 using TrillBot.Discord.App.Options;
+using TrillBot.Discord.Modules.AntiAbuse.Extensions;
 using TrillBot.Discord.Modules.ElasticVoiceChannels.Extensions;
 using TrillBot.Discord.Modules.ElasticVoiceChannels.Options;
+using TrillBot.Discord.Modules.Extensions;
 using TrillBot.Discord.Modules.Options;
 using TrillBot.Discord.Modules.Ping.Extensions;
 
@@ -58,17 +61,26 @@ namespace TrillBot.Discord.App
 
         private IServiceProvider CreateServiceProvider()
         {
+            const string resourcesPath = "Resources";
+
             var services = new ServiceCollection();
 
             // Logging
             var loggingSection = _configuration.GetSection(
                 "Logging");
-            services
-                .AddLogging(builder =>
-                {
-                    builder.AddConfiguration(loggingSection);
-                    builder.AddConsole();
-                });
+            services.AddLogging(builder =>
+            {
+                builder.AddConfiguration(loggingSection);
+                builder.AddConsole();
+            });
+
+            // Localization:
+            // For now, only German language is supported because
+            // the Discord server that uses this bot is a German one as well.
+            services.AddLocalization(options => options.ResourcesPath = resourcesPath);
+            var culture = new CultureInfo("de-DE");
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
 
             // Bot
             var discordSection = _configuration.GetSection(
@@ -76,14 +88,15 @@ namespace TrillBot.Discord.App
             services.AddBootstrapper(discordSection);
 
             // Bot: Modules
-
             var modulesSection = discordSection.GetSection(
                 ModulesOptions.Name);
             var elasticVoiceChannelsSection = modulesSection.GetSection(
                 ElasticVoiceChannelsOptions.Name);
             services
-                .AddPingModule()
-                .AddElasticVoiceChannelsModule(elasticVoiceChannelsSection);
+                .AddModules(modulesSection)
+                .AddAntiAbuseModule()
+                .AddElasticVoiceChannelsModule(elasticVoiceChannelsSection)
+                .AddPingModule();
 
             return services.BuildServiceProvider();
         }
