@@ -4,7 +4,7 @@
 
 This bot is used to manage services for and provided by [TrilluXe](https://twitter.com/trilluxe).
 The author and maintainer is [ceptoplex](https://twitter.com/ceptoplex).
-Found a bug or got an idea idea for a new feature? [Community contributions](https://github.com/ceptoplex/trillbot/blob/master/CONTRIBUTING.md) are possible.
+Found a bug or got an idea for a new feature? [Community contributions](https://github.com/ceptoplex/trillbot/blob/master/CONTRIBUTING.md) are possible.
 
 [![Twitter: Follow @trilluxe](https://img.shields.io/twitter/follow/trilluxe?style=social)](https://twitter.com/trilluxe)
 [![Twitter: Follow @ceptoplex](https://img.shields.io/twitter/follow/ceptoplex?style=social)](https://twitter.com/ceptoplex)
