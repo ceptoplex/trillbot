@@ -27,7 +27,7 @@ It offers the following functionality:
 ## 2. Configuration
 
 All configuration values that do not have any defaults
-and are required to run the application can be found in `src/TrillBot.App/appsettings.yml`.
+and are required to run the application can be found in `src/TrillBot.WebApi/appsettings.yml`.
 They can be set or overwritten using one or both of the following two mechanisms.
 
 ### Environment-specific Configuration File
@@ -37,8 +37,7 @@ there can be additional configuration files in this directory,
 named using the scheme `appsettings.{Environment}.yml`.
 These additional configuration files are excluded from version control by default.
 The decision which of these additional files is loaded is based on the environment
-which can be set using the system environment variable `NETCORE_ENVIRONMENT`.
-It defaults to `Development` if it is not configured explicitly.
+which can be set using the system environment variable `ASPNETCORE_ENVIRONMENT`.
 
 Therefore, it is e.g. possible to use a file named `appsettings.Development.yml` during development
 where you can put in secrets that are different from those used in production and that should
@@ -58,14 +57,14 @@ To build and run the application in a Linux production environment, use the foll
 
     ~$ dotnet restore
     ~$ dotnet build
-    ~$ set NETCORE_ENVIRONMENT=Production
+    ~$ set ASPNETCORE_ENVIRONMENT=Production
     ~$ set TRILLBOT__DISCORD__TOKEN={token}
-    ~$ dotnet run --project=src/TrillBot.App
+    ~$ dotnet run --project=src/TrillBot.WebApi
 
  Or else, you can also use the provided `Dockerfile`:
  
     ~$ docker build -t trillbot .
-    ~$ docker run -d -e NETCORE_ENVIRONMENT=Production -e TRILLBOT__DISCORD__TOKEN={token} trillbot
+    ~$ docker run -d -e ASPNETCORE_ENVIRONMENT=Production -e TRILLBOT__DISCORD__TOKEN={token} trillbot
 
 ### Discord: Invitation & Permissions
 

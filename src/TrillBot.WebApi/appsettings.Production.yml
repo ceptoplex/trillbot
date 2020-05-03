@@ -1,7 +1,7 @@
 Discord:
+  LogChannelIds:
+    - 703934877384310893
   Modules:
-    LogChannelIds:
-      - 703934877384310893
     ElasticVoiceChannels:
       ExcludedChannelIds:
         - 321976095886934026 # Lobby

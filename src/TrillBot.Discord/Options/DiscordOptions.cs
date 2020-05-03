@@ -1,13 +1,12 @@
-using TrillBot.Discord.Modules.Options;
+using System.Collections.Generic;
 
 namespace TrillBot.Discord.Options
 {
-    public class DiscordOptions<TModulesOptions>
-        where TModulesOptions : ModulesOptions
+    public class DiscordOptions
     {
         public const string Name = "Discord";
 
         public string Token { get; set; }
-        public TModulesOptions Modules { get; set; }
+        public IEnumerable<ulong> LogChannelIds { get; set; }
     }
 }

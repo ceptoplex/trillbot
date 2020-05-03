@@ -1,14 +1,11 @@
-using Microsoft.Extensions.DependencyInjection;
-
 namespace TrillBot.Discord.Modules.AntiAbuse.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddAntiAbuseDiscordModule(this IServiceCollection services)
+        public static Modules.Extensions.ServiceCollectionExtensions.ModuleBuilder AddAntiAbuse(
+            this Modules.Extensions.ServiceCollectionExtensions.ModuleBuilder moduleBuilder)
         {
-            services.AddSingleton<IModule, AntiAbuseModule>();
-
-            return services;
+            return moduleBuilder.AddModule<AntiAbuseModule>();
         }
     }
 }

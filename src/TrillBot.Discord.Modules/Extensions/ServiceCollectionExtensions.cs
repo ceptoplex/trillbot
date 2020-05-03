@@ -7,33 +7,44 @@ namespace TrillBot.Discord.Modules.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddDiscordModules(
-            this IServiceCollection services,
-            Action<ModulesOptions> configureOptions)
+        public class ModuleBuilder
         {
-            services.Configure(configureOptions);
-            services.AddDiscordModules();
+            private readonly IServiceCollection _services;
 
-            return services;
-        }
+            public ModuleBuilder(IServiceCollection services)
+            {
+                _services = services;
+            }
 
-        public static IServiceCollection AddDiscordModules(
-            this IServiceCollection services,
-            IConfiguration configuration)
-        {
-            services.Configure<ModulesOptions>(configuration);
-            services.AddDiscordModules();
+            public ModuleBuilder AddModule<TModule>()
+                where TModule : class, IModule
+            {
+                _services.AddSingleton<IModule, TModule>();
 
-            return services;
-        }
+                return this;
+            }
 
-        private static IServiceCollection AddDiscordModules(
-            this IServiceCollection services)
-        {
-            services.AddSingleton<GuildUserAvailability>();
-            services.AddSingleton<Messaging>();
+            public ModuleBuilder AddModule<TModule, TModuleOptions>(Action<TModuleOptions> configureOptions)
+                where TModule : class, IModule
+                where TModuleOptions : class, IModuleOptions
+            {
+                _services
+                    .AddSingleton<IModule, TModule>()
+                    .Configure(configureOptions);
 
-            return services;
+                return this;
+            }
+
+            public ModuleBuilder AddModule<TModule, TModuleOptions>(IConfiguration configuration)
+                where TModule : class, IModule
+                where TModuleOptions : class, IModuleOptions
+            {
+                _services
+                    .AddSingleton<IModule, TModule>()
+                    .Configure<TModuleOptions>(configuration);
+
+                return this;
+            }
         }
     }
 }

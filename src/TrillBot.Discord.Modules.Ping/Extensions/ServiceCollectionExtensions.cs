@@ -1,14 +1,11 @@
-using Microsoft.Extensions.DependencyInjection;
-
 namespace TrillBot.Discord.Modules.Ping.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddPingDiscordModule(this IServiceCollection services)
+        public static Modules.Extensions.ServiceCollectionExtensions.ModuleBuilder AddPing(
+            this Modules.Extensions.ServiceCollectionExtensions.ModuleBuilder moduleBuilder)
         {
-            services.AddSingleton<IModule, PingModule>();
-
-            return services;
+            return moduleBuilder.AddModule<PingModule>();
         }
     }
 }

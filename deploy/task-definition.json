@@ -5,7 +5,7 @@
       "name": "trillbot",
       "environment": [
         {
-          "name": "NETCORE_ENVIRONMENT",
+          "name": "ASPNETCORE_ENVIRONMENT",
           "value": "Production"
         }
       ],

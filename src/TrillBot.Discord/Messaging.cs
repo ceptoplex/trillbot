@@ -4,16 +4,16 @@ using Discord;
 using Discord.Net;
 using Discord.WebSocket;
 using Microsoft.Extensions.Options;
-using TrillBot.Discord.Modules.Options;
+using TrillBot.Discord.Options;
 
-namespace TrillBot.Discord.Modules
+namespace TrillBot.Discord
 {
     public class Messaging
     {
         private readonly DiscordSocketClient _discordClient;
-        private readonly ModulesOptions _options;
+        private readonly DiscordOptions _options;
 
-        public Messaging(DiscordSocketClient discordClient, IOptions<ModulesOptions> options)
+        public Messaging(DiscordSocketClient discordClient, IOptions<DiscordOptions> options)
         {
             _discordClient = discordClient;
             _options = options.Value;

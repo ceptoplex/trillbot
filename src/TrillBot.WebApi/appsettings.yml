@@ -1,7 +1,7 @@
 Discord:
   Token: ~ # Required: string
+  LogChannelIds: ~ # Optional: number[]
   Modules:
-    LogChannelIds: ~ # Optional: number[]
     ElasticVoiceChannels:
       ExcludedChannelIds: ~ # Optional: number[]
       MaxGroupChannelCount: ~ # Optional: number
