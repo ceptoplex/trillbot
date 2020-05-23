@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -42,7 +41,7 @@ namespace TrillBot.Discord
                 return Task.CompletedTask;
             };
 
-            foreach (var module in _serviceProvider.GetRequiredService<IEnumerable<IDiscordModule>>()) module.Initialize();
+            foreach (var module in _serviceProvider.GetServices<IDiscordModule>()) module.Initialize();
 
             await _discordClient.LoginAsync(TokenType.Bot, _options.Token);
             await _discordClient.StartAsync();
