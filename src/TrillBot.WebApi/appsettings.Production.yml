@@ -6,3 +6,6 @@ Discord:
       ExcludedChannelIds:
         - 321976095886934026 # Lobby
       MaxGroupChannelCount: 10
+Twitch:
+  Api:
+    ClientId: "7wss5gj6c90kb8mcr5kvxg2s26p48d"

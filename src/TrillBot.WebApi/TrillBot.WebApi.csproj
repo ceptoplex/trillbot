@@ -15,6 +15,7 @@
         <ProjectReference Include="..\TrillBot.Discord.Modules.ElasticVoiceChannels\TrillBot.Discord.Modules.ElasticVoiceChannels.csproj"/>
         <ProjectReference Include="..\TrillBot.Discord.Modules.Ping\TrillBot.Discord.Modules.Ping.csproj"/>
         <ProjectReference Include="..\TrillBot.Discord\TrillBot.Discord.csproj"/>
+        <ProjectReference Include="..\TrillBot.Twitch.Api\TrillBot.Twitch.Api.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

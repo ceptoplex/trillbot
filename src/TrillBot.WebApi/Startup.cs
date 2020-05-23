@@ -10,6 +10,8 @@ using TrillBot.Discord.Modules.ElasticVoiceChannels.Extensions;
 using TrillBot.Discord.Modules.ElasticVoiceChannels.Options;
 using TrillBot.Discord.Modules.Ping.Extensions;
 using TrillBot.Discord.Options;
+using TrillBot.Twitch.Api.Extensions;
+using TrillBot.Twitch.Api.Options;
 using TrillBot.WebApi.Services;
 
 namespace TrillBot.WebApi
@@ -31,6 +33,9 @@ namespace TrillBot.WebApi
             var culture = new CultureInfo("de-DE");
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
+
+            services
+                .AddTwitchApi(_configuration.GetSection(TwitchApiOptions.Key));
 
             services
                 .AddDiscord(builder =>

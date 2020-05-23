@@ -13,6 +13,10 @@
         {
           "name": "TRILLBOT__DISCORD__TOKEN",
           "valueFrom": "arn:aws:ssm:eu-central-1:528655409007:parameter/trillbot_discord-token"
+        },
+        {
+          "name": "TRILLBOT__TWITCH__API__CLIENTSECRET",
+          "valueFrom": "arn:aws:ssm:eu-central-1:528655409007:parameter/trillbot_twitch-api-clientSecret"
         }
       ],
       "memory": 512,

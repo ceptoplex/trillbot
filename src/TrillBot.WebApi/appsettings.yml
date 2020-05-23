@@ -9,3 +9,7 @@ Logging:
   LogLevel:
     Default: "Information"
     # Optional: Log levels for other namespace prefixes.
+Twitch:
+  Api:
+    ClientId: ~ # Required: string
+    ClientSecret: ~ # Required: string
