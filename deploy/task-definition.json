@@ -19,8 +19,8 @@
           "valueFrom": "arn:aws:ssm:eu-central-1:528655409007:parameter/trillbot_twitch-api-clientSecret"
         }
       ],
-      "memory": 512,
-      "memoryReservation": 512,
+      "memory": 1024,
+      "memoryReservation": 1024,
       "cpu": 256,
       "logConfiguration": {
         "logDriver": "awslogs",
@@ -32,7 +32,7 @@
       }
     }
   ],
-  "memory": "512",
+  "memory": "1024",
   "cpu": "256",
   "requiresCompatibilities": [
     "EC2"
