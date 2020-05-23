@@ -59,12 +59,21 @@ To build and run the application in a Linux production environment, use the foll
     ~$ dotnet build
     ~$ set ASPNETCORE_ENVIRONMENT=Production
     ~$ set TRILLBOT__DISCORD__TOKEN={token}
+    ~$ set TRILLBOT__TWITCH__API__CLIENTSECRET={secret}
     ~$ dotnet run --project=src/TrillBot.WebApi
 
- Or else, you can also use the provided `Dockerfile`:
+ Or else, you can also use the provided `Dockerfile`, e.g., like this:
  
     ~$ docker build -t trillbot .
-    ~$ docker run -d -e ASPNETCORE_ENVIRONMENT=Production -e TRILLBOT__DISCORD__TOKEN={token} trillbot
+    ~$ docker run \
+        -d \
+        -e ASPNETCORE_ENVIRONMENT=Production \
+        -e TRILLBOT__DISCORD__TOKEN={token} \
+        -e TRILLBOT__TWITCH__API__CLIENTSECRET={secret} \
+        trillbot
+
+Here, secrets and tokens have been passed via environment variables because they may not be stored
+in an unprotected configuration file.
 
 ### Discord: Invitation & Permissions
 
