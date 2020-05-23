@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrillBot.WebApi", "src\Tril
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrillBot.Twitch.Api", "src\TrillBot.Twitch.Api\TrillBot.Twitch.Api.csproj", "{6AB3046A-E458-4A3A-BFB7-6E895D00AA3D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrillBot.Twitch.Webhooks", "src\TrillBot.Twitch.Webhooks\TrillBot.Twitch.Webhooks.csproj", "{F18B44FC-CA75-4453-A5FD-59CCC26D2A5D}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrillBot.Common", "src\TrillBot.Common\TrillBot.Common.csproj", "{B37B27D2-2D7F-46B0-85A8-56268A12212B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrillBot.WebSub", "src\TrillBot.WebSub\TrillBot.WebSub.csproj", "{BB73C2B4-EA2C-4BB8-81A5-67DBA63527C6}"
@@ -48,6 +50,10 @@ Global
 		{6AB3046A-E458-4A3A-BFB7-6E895D00AA3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6AB3046A-E458-4A3A-BFB7-6E895D00AA3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6AB3046A-E458-4A3A-BFB7-6E895D00AA3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F18B44FC-CA75-4453-A5FD-59CCC26D2A5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F18B44FC-CA75-4453-A5FD-59CCC26D2A5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F18B44FC-CA75-4453-A5FD-59CCC26D2A5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F18B44FC-CA75-4453-A5FD-59CCC26D2A5D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B37B27D2-2D7F-46B0-85A8-56268A12212B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B37B27D2-2D7F-46B0-85A8-56268A12212B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B37B27D2-2D7F-46B0-85A8-56268A12212B}.Release|Any CPU.ActiveCfg = Release|Any CPU

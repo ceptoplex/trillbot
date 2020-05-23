@@ -16,6 +16,7 @@
         <ProjectReference Include="..\TrillBot.Discord.Modules.Ping\TrillBot.Discord.Modules.Ping.csproj"/>
         <ProjectReference Include="..\TrillBot.Discord\TrillBot.Discord.csproj"/>
         <ProjectReference Include="..\TrillBot.Twitch.Api\TrillBot.Twitch.Api.csproj"/>
+        <ProjectReference Include="..\TrillBot.Twitch.Webhooks\TrillBot.Twitch.Webhooks.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

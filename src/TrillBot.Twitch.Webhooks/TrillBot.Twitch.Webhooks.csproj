@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <LangVersion>8</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\TrillBot.Common\TrillBot.Common.csproj" />
+        <ProjectReference Include="..\TrillBot.Twitch.Api\TrillBot.Twitch.Api.csproj" />
+        <ProjectReference Include="..\TrillBot.WebSub\TrillBot.WebSub.csproj" />
+    </ItemGroup>
+
+</Project>

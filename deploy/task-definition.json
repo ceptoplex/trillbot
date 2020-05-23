@@ -3,10 +3,25 @@
   "containerDefinitions": [
     {
       "name": "trillbot",
+      "portMappings": [
+        {
+          "hostPort": 8090,
+          "protocol": "tcp",
+          "containerPort": 80
+        }
+      ],
       "environment": [
         {
           "name": "ASPNETCORE_ENVIRONMENT",
           "value": "Production"
+        },
+        {
+          "name": "VIRTUAL_HOST",
+          "value": "bot.trilluxe.tv"
+        },
+        {
+          "name": "VIRTUAL_PORT",
+          "value": "80"
         }
       ],
       "secrets": [

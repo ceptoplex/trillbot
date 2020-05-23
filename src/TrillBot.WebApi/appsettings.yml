@@ -13,3 +13,5 @@ Twitch:
   Api:
     ClientId: ~ # Required: string
     ClientSecret: ~ # Required: string
+WebApi:
+  PublicUrl: ~ # Required: string(URL)

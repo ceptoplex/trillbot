@@ -9,3 +9,5 @@ Discord:
 Twitch:
   Api:
     ClientId: "7wss5gj6c90kb8mcr5kvxg2s26p48d"
+WebApi:
+  PublicUrl: "https://bot.trilluxe.tv"
