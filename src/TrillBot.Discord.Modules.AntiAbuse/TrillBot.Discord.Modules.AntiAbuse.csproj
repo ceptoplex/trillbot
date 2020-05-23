@@ -6,7 +6,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\TrillBot.Discord.Modules\TrillBot.Discord.Modules.csproj"/>
         <ProjectReference Include="..\TrillBot.Discord\TrillBot.Discord.csproj"/>
     </ItemGroup>
 

@@ -21,7 +21,7 @@ namespace TrillBot.WebApi
                     appBuilder
                         .SetBasePath(context.HostingEnvironment.ContentRootPath)
                         .AddYamlFile("appsettings.yml", false, true)
-                        .AddYamlFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.yml", false, true)
+                        .AddYamlFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.yml", true, true)
                         .AddEnvironmentVariables("TrillBot:")
                         .Build();
                 })

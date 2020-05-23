@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using TrillBot.Discord.Modules.Options;
+using TrillBot.Discord.Options;
 
 namespace TrillBot.Discord.Modules.ElasticVoiceChannels.Options
 {
-    public class ElasticVoiceChannelsOptions : IModuleOptions
+    public class ElasticVoiceChannelsOptions : ModuleOptions
     {
-        public const string Name = "ElasticVoiceChannels";
+        public new static readonly string Key = $"{ModuleOptions.Key}:ElasticVoiceChannels";
 
         public IEnumerable<ulong> ExcludedChannelIds { get; set; }
         public int? MaxGroupChannelCount { get; set; }

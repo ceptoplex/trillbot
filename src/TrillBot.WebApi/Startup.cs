@@ -8,7 +8,6 @@ using TrillBot.Discord.Extensions;
 using TrillBot.Discord.Modules.AntiAbuse.Extensions;
 using TrillBot.Discord.Modules.ElasticVoiceChannels.Extensions;
 using TrillBot.Discord.Modules.ElasticVoiceChannels.Options;
-using TrillBot.Discord.Modules.Options;
 using TrillBot.Discord.Modules.Ping.Extensions;
 using TrillBot.Discord.Options;
 using TrillBot.WebApi.Services;
@@ -33,19 +32,14 @@ namespace TrillBot.WebApi
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
 
-            var discordSection = _configuration
-                .GetSection(DiscordOptions.Name);
-            var elasticVoiceChannelsSection = discordSection
-                .GetSection(IModuleOptions.Name)
-                .GetSection(ElasticVoiceChannelsOptions.Name);
             services
                 .AddDiscord(builder =>
                     {
                         builder.AddAntiAbuse();
-                        builder.AddElasticVoiceChannels(elasticVoiceChannelsSection);
+                        builder.AddElasticVoiceChannels(_configuration.GetSection(ElasticVoiceChannelsOptions.Key));
                         builder.AddPing();
                     },
-                    discordSection)
+                    _configuration.GetSection(DiscordOptions.Key))
                 .AddHostedService<DiscordService>();
         }
 

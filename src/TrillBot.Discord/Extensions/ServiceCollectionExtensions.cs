@@ -10,7 +10,7 @@ namespace TrillBot.Discord.Extensions
     {
         public static IServiceCollection AddDiscord(
             this IServiceCollection services,
-            Action<Modules.Extensions.ServiceCollectionExtensions.ModuleBuilder> configureModules,
+            Action<ModuleBuilder> configureModules,
             Action<DiscordOptions> configureOptions)
         {
             return services
@@ -20,7 +20,7 @@ namespace TrillBot.Discord.Extensions
 
         public static IServiceCollection AddDiscord(
             this IServiceCollection services,
-            Action<Modules.Extensions.ServiceCollectionExtensions.ModuleBuilder> configureModules,
+            Action<ModuleBuilder> configureModules,
             IConfiguration configuration)
         {
             return services
@@ -30,7 +30,7 @@ namespace TrillBot.Discord.Extensions
 
         private static IServiceCollection AddDiscordBotDependencies(
             this IServiceCollection services,
-            Action<Modules.Extensions.ServiceCollectionExtensions.ModuleBuilder> configureModules)
+            Action<ModuleBuilder> configureModules)
         {
             services
                 .AddSingleton<DiscordBot>()
@@ -38,10 +38,61 @@ namespace TrillBot.Discord.Extensions
                 .AddSingleton<GuildUserAvailability>()
                 .AddSingleton<Messaging>();
 
-            var moduleBuilder = new Modules.Extensions.ServiceCollectionExtensions.ModuleBuilder(services);
+            var moduleBuilder = new ModuleBuilder(services);
             configureModules(moduleBuilder);
 
             return services;
+        }
+
+        public class ModuleBuilder
+        {
+            private readonly IServiceCollection _services;
+
+            public ModuleBuilder(IServiceCollection services)
+            {
+                _services = services;
+            }
+
+            public ModuleBuilder AddModule<TModule>()
+                where TModule : class, IModule
+            {
+                _services.AddSingleton<IModule, TModule>();
+
+                return this;
+            }
+
+            public ModuleBuilder AddModule<TModule, TModuleOptions>(Action<TModuleOptions> configureOptions)
+                where TModule : class, IModule
+                where TModuleOptions : ModuleOptions
+            {
+                _services
+                    .AddSingleton<IModule, TModule>()
+                    .Configure(configureOptions);
+
+                return this;
+            }
+
+            public ModuleBuilder AddModule<TModule, TModuleOptions>(IConfiguration configuration)
+                where TModule : class, IModule
+                where TModuleOptions : ModuleOptions
+            {
+                _services
+                    .AddSingleton<IModule, TModule>()
+                    .Configure<TModuleOptions>(configuration);
+
+                return this;
+            }
+
+            public ModuleBuilder AddModule<TModule, TModuleOptions>(string name, IConfiguration configuration)
+                where TModule : class, IModule
+                where TModuleOptions : ModuleOptions
+            {
+                _services
+                    .AddSingleton<IModule, TModule>()
+                    .Configure<TModuleOptions>(name, configuration);
+
+                return this;
+            }
         }
     }
 }

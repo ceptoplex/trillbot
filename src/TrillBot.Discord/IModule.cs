@@ -1,4 +1,4 @@
-namespace TrillBot.Discord.Modules
+namespace TrillBot.Discord
 {
     public interface IModule
     {
