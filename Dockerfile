@@ -4,12 +4,16 @@ FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build-env
 WORKDIR /app
 
 COPY ./*.sln ./
+COPY ./src/TrillBot.Common/*.csproj ./src/TrillBot.Common/
 COPY ./src/TrillBot.Discord/*.csproj ./src/TrillBot.Discord/
-COPY ./src/TrillBot.Discord.Modules/*.csproj ./src/TrillBot.Discord.Modules/
 COPY ./src/TrillBot.Discord.Modules.AntiAbuse/*.csproj ./src/TrillBot.Discord.Modules.AntiAbuse/
 COPY ./src/TrillBot.Discord.Modules.ElasticVoiceChannels/*.csproj ./src/TrillBot.Discord.Modules.ElasticVoiceChannels/
 COPY ./src/TrillBot.Discord.Modules.Ping/*.csproj ./src/TrillBot.Discord.Modules.Ping/
+COPY ./src/TrillBot.Twitch.Api/*.csproj ./src/TrillBot.Twitch.Api/
+COPY ./src/TrillBot.Twitch.Webhooks/*.csproj ./src/TrillBot.Twitch.Webhooks/
 COPY ./src/TrillBot.WebApi/*.csproj ./src/TrillBot.WebApi/
+COPY ./src/TrillBot.WebSub/*.csproj ./src/TrillBot.WebSub/
+COPY ./src/TrillBot.WebSub.Abstractions/*.csproj ./src/TrillBot.WebSub.Abstractions/
 RUN dotnet restore
 
 COPY . ./
