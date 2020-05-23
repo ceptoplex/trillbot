@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TrillBot.Discord.Modules.AntiAbuse.Confusables
 {
-    internal class ConfusablesCache
+    internal sealed class ConfusablesCache
     {
         private const string ResourceUrl = "https://www.unicode.org/Public/security/latest/confusables.txt";
         private static readonly TimeSpan CacheMaxAge = TimeSpan.FromDays(1);

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace TrillBot.Discord.Options
 {
-    public class DiscordOptions
+    public sealed class DiscordOptions
     {
         public const string Key = "Discord";
 

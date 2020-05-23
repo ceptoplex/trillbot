@@ -8,12 +8,12 @@ using TrillBot.Discord.Options;
 
 namespace TrillBot.Discord
 {
-    public class Messaging
+    public sealed class DiscordMessaging
     {
         private readonly DiscordSocketClient _discordClient;
         private readonly DiscordOptions _options;
 
-        public Messaging(DiscordSocketClient discordClient, IOptions<DiscordOptions> options)
+        public DiscordMessaging(DiscordSocketClient discordClient, IOptions<DiscordOptions> options)
         {
             _discordClient = discordClient;
             _options = options.Value;

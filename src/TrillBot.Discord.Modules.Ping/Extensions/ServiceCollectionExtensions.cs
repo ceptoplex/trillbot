@@ -5,7 +5,7 @@ namespace TrillBot.Discord.Modules.Ping.Extensions
         public static Discord.Extensions.ServiceCollectionExtensions.ModuleBuilder AddPing(
             this Discord.Extensions.ServiceCollectionExtensions.ModuleBuilder moduleBuilder)
         {
-            return moduleBuilder.AddModule<PingModule>();
+            return moduleBuilder.AddModule<PingDiscordModule>();
         }
     }
 }

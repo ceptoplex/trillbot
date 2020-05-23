@@ -14,7 +14,7 @@ using TrillBot.WebApi.Services;
 
 namespace TrillBot.WebApi
 {
-    internal class Startup
+    internal sealed class Startup
     {
         private readonly IConfiguration _configuration;
 
@@ -40,7 +40,7 @@ namespace TrillBot.WebApi
                         builder.AddPing();
                     },
                     _configuration.GetSection(DiscordOptions.Key))
-                .AddHostedService<DiscordService>();
+                .AddHostedService<DiscordBotService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

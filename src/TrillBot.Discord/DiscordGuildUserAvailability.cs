@@ -4,7 +4,7 @@ using Discord;
 
 namespace TrillBot.Discord
 {
-    public class GuildUserAvailability
+    public sealed class DiscordGuildUserAvailability
     {
         private readonly IDictionary<ulong, Task> _downloadUsersTasks = new Dictionary<ulong, Task>();
 

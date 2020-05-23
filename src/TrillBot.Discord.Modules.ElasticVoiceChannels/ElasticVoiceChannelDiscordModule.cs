@@ -9,7 +9,7 @@ using TrillBot.Discord.Modules.ElasticVoiceChannels.Options;
 
 namespace TrillBot.Discord.Modules.ElasticVoiceChannels
 {
-    public class ElasticVoiceChannelModule : IModule
+    internal sealed class ElasticVoiceChannelDiscordModule : IDiscordModule
     {
         private readonly IDictionary<IGuild, Awaiter<ulong>> _channelFixResultAwaiters
             = new Dictionary<IGuild, Awaiter<ulong>>();
@@ -17,7 +17,7 @@ namespace TrillBot.Discord.Modules.ElasticVoiceChannels
         private readonly DiscordSocketClient _discordClient;
         private readonly ElasticVoiceChannelsOptions _options;
 
-        public ElasticVoiceChannelModule(
+        public ElasticVoiceChannelDiscordModule(
             DiscordSocketClient discordClient,
             IOptions<ElasticVoiceChannelsOptions> options)
         {

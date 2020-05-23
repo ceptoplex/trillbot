@@ -1,6 +1,6 @@
 namespace TrillBot.Discord
 {
-    public interface IModule
+    public interface IDiscordModule
     {
         void Initialize();
     }

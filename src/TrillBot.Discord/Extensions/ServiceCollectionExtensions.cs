@@ -35,8 +35,8 @@ namespace TrillBot.Discord.Extensions
             services
                 .AddSingleton<DiscordBot>()
                 .AddSingleton<DiscordSocketClient>()
-                .AddSingleton<GuildUserAvailability>()
-                .AddSingleton<Messaging>();
+                .AddSingleton<DiscordGuildUserAvailability>()
+                .AddSingleton<DiscordMessaging>();
 
             var moduleBuilder = new ModuleBuilder(services);
             configureModules(moduleBuilder);
@@ -53,43 +53,47 @@ namespace TrillBot.Discord.Extensions
                 _services = services;
             }
 
-            public ModuleBuilder AddModule<TModule>()
-                where TModule : class, IModule
+            public ModuleBuilder AddModule<TDiscordModule>()
+                where TDiscordModule : class, IDiscordModule
             {
-                _services.AddSingleton<IModule, TModule>();
+                _services.AddSingleton<IDiscordModule, TDiscordModule>();
 
                 return this;
             }
 
-            public ModuleBuilder AddModule<TModule, TModuleOptions>(Action<TModuleOptions> configureOptions)
-                where TModule : class, IModule
-                where TModuleOptions : ModuleOptions
+            public ModuleBuilder AddModule<TDiscordModule, TDiscordModuleOptions>(
+                Action<TDiscordModuleOptions> configureOptions)
+                where TDiscordModule : class, IDiscordModule
+                where TDiscordModuleOptions : DiscordModuleOptions
             {
                 _services
-                    .AddSingleton<IModule, TModule>()
+                    .AddSingleton<IDiscordModule, TDiscordModule>()
                     .Configure(configureOptions);
 
                 return this;
             }
 
-            public ModuleBuilder AddModule<TModule, TModuleOptions>(IConfiguration configuration)
-                where TModule : class, IModule
-                where TModuleOptions : ModuleOptions
+            public ModuleBuilder AddModule<TDiscordModule, TDiscordModuleOptions>(
+                IConfiguration configuration)
+                where TDiscordModule : class, IDiscordModule
+                where TDiscordModuleOptions : DiscordModuleOptions
             {
                 _services
-                    .AddSingleton<IModule, TModule>()
-                    .Configure<TModuleOptions>(configuration);
+                    .AddSingleton<IDiscordModule, TDiscordModule>()
+                    .Configure<TDiscordModuleOptions>(configuration);
 
                 return this;
             }
 
-            public ModuleBuilder AddModule<TModule, TModuleOptions>(string name, IConfiguration configuration)
-                where TModule : class, IModule
-                where TModuleOptions : ModuleOptions
+            public ModuleBuilder AddModule<TDiscordModule, TDiscordModuleOptions>(
+                string name,
+                IConfiguration configuration)
+                where TDiscordModule : class, IDiscordModule
+                where TDiscordModuleOptions : DiscordModuleOptions
             {
                 _services
-                    .AddSingleton<IModule, TModule>()
-                    .Configure<TModuleOptions>(name, configuration);
+                    .AddSingleton<IDiscordModule, TDiscordModule>()
+                    .Configure<TDiscordModuleOptions>(name, configuration);
 
                 return this;
             }

@@ -2,11 +2,11 @@ using Discord.WebSocket;
 
 namespace TrillBot.Discord.Modules.Ping
 {
-    public class PingModule : IModule
+    internal sealed class PingDiscordModule : IDiscordModule
     {
         private readonly DiscordSocketClient _discordClient;
 
-        public PingModule(DiscordSocketClient discordClient)
+        public PingDiscordModule(DiscordSocketClient discordClient)
         {
             _discordClient = discordClient;
         }

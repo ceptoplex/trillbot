@@ -4,7 +4,7 @@ using Discord;
 
 namespace TrillBot.Discord.Modules.ElasticVoiceChannels
 {
-    internal class IndexedChannelName : IEquatable<IndexedChannelName>
+    internal sealed class IndexedChannelName : IEquatable<IndexedChannelName>
     {
         private static readonly Regex Pattern = new Regex(@"^(?<name>.+?)( \((?<index>\d+)\))?$");
 

@@ -7,7 +7,7 @@ using Fastenshtein;
 namespace TrillBot.Discord.Modules.AntiAbuse.Confusables
 {
     // See: https://www.unicode.org/reports/tr39/#Confusable_Detection
-    internal class ConfusablesDetection
+    internal sealed class ConfusablesDetection
     {
         private readonly ConfusablesCache _confusablesCache;
 

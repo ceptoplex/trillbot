@@ -5,11 +5,11 @@ using TrillBot.Discord;
 
 namespace TrillBot.WebApi.Services
 {
-    internal class DiscordService : IHostedService
+    internal sealed class DiscordBotService : IHostedService
     {
         private readonly DiscordBot _discordBot;
 
-        public DiscordService(DiscordBot discordBot)
+        public DiscordBotService(DiscordBot discordBot)
         {
             _discordBot = discordBot;
         }

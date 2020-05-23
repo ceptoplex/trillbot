@@ -11,7 +11,7 @@ using TrillBot.Discord.Options;
 
 namespace TrillBot.Discord
 {
-    public class DiscordBot
+    public sealed class DiscordBot
     {
         private readonly DiscordSocketClient _discordClient;
         private readonly ILogger<DiscordBot> _logger;
@@ -42,7 +42,7 @@ namespace TrillBot.Discord
                 return Task.CompletedTask;
             };
 
-            foreach (var module in _serviceProvider.GetRequiredService<IEnumerable<IModule>>()) module.Initialize();
+            foreach (var module in _serviceProvider.GetRequiredService<IEnumerable<IDiscordModule>>()) module.Initialize();
 
             await _discordClient.LoginAsync(TokenType.Bot, _options.Token);
             await _discordClient.StartAsync();

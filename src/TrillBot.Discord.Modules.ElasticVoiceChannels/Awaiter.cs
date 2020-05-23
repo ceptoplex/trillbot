@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TrillBot.Discord.Modules.ElasticVoiceChannels
 {
-    internal class Awaiter<T>
+    internal sealed class Awaiter<T>
     {
         private readonly ICollection<T> _awaited = new List<T>();
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1);

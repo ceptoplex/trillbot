@@ -3,9 +3,9 @@ using TrillBot.Discord.Options;
 
 namespace TrillBot.Discord.Modules.ElasticVoiceChannels.Options
 {
-    public class ElasticVoiceChannelsOptions : ModuleOptions
+    public sealed class ElasticVoiceChannelsOptions : DiscordModuleOptions
     {
-        public new static readonly string Key = $"{ModuleOptions.Key}:ElasticVoiceChannels";
+        public new static readonly string Key = $"{DiscordModuleOptions.Key}:ElasticVoiceChannels";
 
         public IEnumerable<ulong> ExcludedChannelIds { get; set; }
         public int? MaxGroupChannelCount { get; set; }

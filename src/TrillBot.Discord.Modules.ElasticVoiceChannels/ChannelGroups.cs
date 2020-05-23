@@ -6,7 +6,7 @@ using Discord;
 
 namespace TrillBot.Discord.Modules.ElasticVoiceChannels
 {
-    internal class ChannelGroups<TChannel>
+    internal sealed class ChannelGroups<TChannel>
         where TChannel : class, IChannel
     {
         private readonly IDictionary<TChannel, ICollection<TChannel>> _groups =

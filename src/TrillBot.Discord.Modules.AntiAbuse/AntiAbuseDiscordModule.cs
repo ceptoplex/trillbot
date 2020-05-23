@@ -6,23 +6,23 @@ using TrillBot.Discord.Modules.AntiAbuse.Confusables;
 
 namespace TrillBot.Discord.Modules.AntiAbuse
 {
-    public class AntiAbuseModule : IModule
+    internal sealed class AntiAbuseDiscordModule : IDiscordModule
     {
         private const string MessagingTag = "Anti-Abuse";
 
+        private readonly DiscordSocketClient _client;
         private readonly ConfusablesDetection _confusablesDetection;
-        private readonly DiscordSocketClient _discordClient;
-        private readonly GuildUserAvailability _guildUserAvailability;
-        private readonly IStringLocalizer<AntiAbuseModule> _localizer;
-        private readonly Messaging _messaging;
+        private readonly DiscordGuildUserAvailability _guildUserAvailability;
+        private readonly IStringLocalizer<AntiAbuseDiscordModule> _localizer;
+        private readonly DiscordMessaging _messaging;
 
-        public AntiAbuseModule(
-            DiscordSocketClient discordClient,
-            GuildUserAvailability guildUserAvailability,
-            Messaging messaging,
-            IStringLocalizer<AntiAbuseModule> localizer)
+        public AntiAbuseDiscordModule(
+            DiscordSocketClient client,
+            DiscordGuildUserAvailability guildUserAvailability,
+            DiscordMessaging messaging,
+            IStringLocalizer<AntiAbuseDiscordModule> localizer)
         {
-            _discordClient = discordClient;
+            _client = client;
             _guildUserAvailability = guildUserAvailability;
             _messaging = messaging;
             _localizer = localizer;
@@ -31,16 +31,16 @@ namespace TrillBot.Discord.Modules.AntiAbuse
 
         public void Initialize()
         {
-            _discordClient.Ready += async () =>
+            _client.Ready += async () =>
             {
                 // We need to use the Ready event for this because we need all users to be available
                 // and fetching users somehow doesn't work well with the GuildAvailable events.
-                foreach (var guild in _discordClient.Guilds)
+                foreach (var guild in _client.Guilds)
                     await OnGuildAvailable(guild);
             };
-            _discordClient.JoinedGuild += OnGuildAvailable;
-            _discordClient.UserJoined += OnGuildMemberChanged;
-            _discordClient.GuildMemberUpdated += async (oldUser, newUser) =>
+            _client.JoinedGuild += OnGuildAvailable;
+            _client.UserJoined += OnGuildMemberChanged;
+            _client.GuildMemberUpdated += async (oldUser, newUser) =>
             {
                 if (oldUser.Username == newUser.Username &&
                     oldUser.Nickname == newUser.Nickname)
@@ -69,7 +69,7 @@ namespace TrillBot.Discord.Modules.AntiAbuse
 
         private async Task<bool> PreventBotImpersonationAsync(IGuildUser user)
         {
-            var bot = await user.Guild.GetUserAsync(_discordClient.CurrentUser.Id);
+            var bot = await user.Guild.GetUserAsync(_client.CurrentUser.Id);
             if (user.Id == bot.Id)
                 return false;
 
