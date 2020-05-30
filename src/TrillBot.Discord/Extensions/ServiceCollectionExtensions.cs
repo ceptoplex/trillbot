@@ -46,17 +46,17 @@ namespace TrillBot.Discord.Extensions
 
         public class ModuleBuilder
         {
-            private readonly IServiceCollection _services;
-
             public ModuleBuilder(IServiceCollection services)
             {
-                _services = services;
+                Services = services;
             }
+
+            public IServiceCollection Services { get; }
 
             public ModuleBuilder AddModule<TDiscordModule>()
                 where TDiscordModule : class, IDiscordModule
             {
-                _services.AddSingleton<IDiscordModule, TDiscordModule>();
+                Services.AddSingleton<IDiscordModule, TDiscordModule>();
 
                 return this;
             }
@@ -66,7 +66,7 @@ namespace TrillBot.Discord.Extensions
                 where TDiscordModule : class, IDiscordModule
                 where TDiscordModuleOptions : DiscordModuleOptions
             {
-                _services
+                Services
                     .AddSingleton<IDiscordModule, TDiscordModule>()
                     .Configure(configureOptions);
 
@@ -78,7 +78,7 @@ namespace TrillBot.Discord.Extensions
                 where TDiscordModule : class, IDiscordModule
                 where TDiscordModuleOptions : DiscordModuleOptions
             {
-                _services
+                Services
                     .AddSingleton<IDiscordModule, TDiscordModule>()
                     .Configure<TDiscordModuleOptions>(configuration);
 
@@ -91,7 +91,7 @@ namespace TrillBot.Discord.Extensions
                 where TDiscordModule : class, IDiscordModule
                 where TDiscordModuleOptions : DiscordModuleOptions
             {
-                _services
+                Services
                     .AddSingleton<IDiscordModule, TDiscordModule>()
                     .Configure<TDiscordModuleOptions>(name, configuration);
 

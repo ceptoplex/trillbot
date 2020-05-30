@@ -3,7 +3,7 @@ using TrillBot.Discord.Options;
 
 namespace TrillBot.Discord.Modules.ElasticVoiceChannels.Options
 {
-    public sealed class ElasticVoiceChannelsOptions : DiscordModuleOptions
+    public sealed class DiscordElasticVoiceChannelsModuleOptions : DiscordModuleOptions
     {
         public new static readonly string Key = $"{DiscordModuleOptions.Key}:ElasticVoiceChannels";
 

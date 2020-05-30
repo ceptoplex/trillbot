@@ -49,12 +49,12 @@ namespace TrillBot.WebApi
                         .Append(TwitchWebhooksCallbackControllerRouteTemplate));
 
             services
-                .AddDiscord(builder =>
-                    {
-                        builder.AddAntiAbuse();
-                        builder.AddElasticVoiceChannels(_configuration.GetSection(ElasticVoiceChannelsOptions.Key));
-                        builder.AddPing();
-                    },
+                .AddDiscord(
+                    builder => builder
+                        .AddAntiAbuse()
+                        .AddElasticVoiceChannels(
+                            _configuration.GetSection(DiscordElasticVoiceChannelsModuleOptions.Key))
+                        .AddPing(),
                     _configuration.GetSection(DiscordOptions.Key))
                 .AddHostedService<DiscordBotService>();
 

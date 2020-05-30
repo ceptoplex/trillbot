@@ -59,7 +59,6 @@ namespace TrillBot.WebSub.Extensions
 
         public class SubscriptionsBuilder
         {
-            private readonly Uri _hubUrl;
             private readonly IServiceCollection _services;
 
             private readonly ICollection<ContentTypeInfo>
@@ -70,13 +69,12 @@ namespace TrillBot.WebSub.Extensions
             public SubscriptionsBuilder(IServiceCollection services, Uri hubUrl, string callbackControllerRouteTemplate)
             {
                 _services = services;
-                _hubUrl = hubUrl;
 
                 services
                     .AddSingleton<IKeyVault, KeyVault>()
                     .AddSingleton<ISignatureVerifier, SignatureVerifier>()
                     .AddSingleton<IHubApiClient>(_ => new HubApiClient(
-                        _hubUrl,
+                        hubUrl,
                         _.GetService<IWebSubHubApiRequestAuthenticator>()))
                     .AddSingleton<IVerificationCallback, VerificationCallback>();
 

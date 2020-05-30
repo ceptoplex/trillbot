@@ -9,32 +9,32 @@ using TrillBot.Discord.Modules.ElasticVoiceChannels.Options;
 
 namespace TrillBot.Discord.Modules.ElasticVoiceChannels
 {
-    internal sealed class ElasticVoiceChannelDiscordModule : IDiscordModule
+    internal sealed class DiscordElasticVoiceChannelModule : IDiscordModule
     {
         private readonly IDictionary<IGuild, Awaiter<ulong>> _channelFixResultAwaiters
             = new Dictionary<IGuild, Awaiter<ulong>>();
 
-        private readonly DiscordSocketClient _discordClient;
-        private readonly ElasticVoiceChannelsOptions _options;
+        private readonly DiscordSocketClient _client;
+        private readonly DiscordElasticVoiceChannelsModuleOptions _options;
 
-        public ElasticVoiceChannelDiscordModule(
-            DiscordSocketClient discordClient,
-            IOptions<ElasticVoiceChannelsOptions> options)
+        public DiscordElasticVoiceChannelModule(
+            DiscordSocketClient client,
+            IOptions<DiscordElasticVoiceChannelsModuleOptions> options)
         {
-            _discordClient = discordClient;
+            _client = client;
             _options = options.Value;
         }
 
         public void Initialize()
         {
-            _discordClient.GuildAvailable += OnGuildAvailable;
-            _discordClient.JoinedGuild += OnGuildAvailable;
+            _client.GuildAvailable += OnGuildAvailable;
+            _client.JoinedGuild += OnGuildAvailable;
 
-            _discordClient.ChannelCreated += OnChannelModified;
-            _discordClient.ChannelDestroyed += OnChannelModified;
-            _discordClient.ChannelUpdated += (oldChannel, newChannel) => OnChannelModified(oldChannel);
+            _client.ChannelCreated += OnChannelModified;
+            _client.ChannelDestroyed += OnChannelModified;
+            _client.ChannelUpdated += (oldChannel, newChannel) => OnChannelModified(oldChannel);
 
-            _discordClient.UserVoiceStateUpdated += OnUserVoiceStateUpdated;
+            _client.UserVoiceStateUpdated += OnUserVoiceStateUpdated;
 
             async Task OnGuildAvailable(SocketGuild guild)
             {
@@ -186,7 +186,7 @@ namespace TrillBot.Discord.Modules.ElasticVoiceChannels
                             break;
                         case PermissionTarget.User:
                             await createdChannel.AddPermissionOverwriteAsync(
-                                _discordClient.GetUser(overwrite.TargetId),
+                                _client.GetUser(overwrite.TargetId),
                                 overwrite.Permissions);
                             break;
                         default:

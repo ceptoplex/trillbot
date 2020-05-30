@@ -2,18 +2,18 @@ using Discord.WebSocket;
 
 namespace TrillBot.Discord.Modules.Ping
 {
-    internal sealed class PingDiscordModule : IDiscordModule
+    internal sealed class DiscordPingModule : IDiscordModule
     {
-        private readonly DiscordSocketClient _discordClient;
+        private readonly DiscordSocketClient _client;
 
-        public PingDiscordModule(DiscordSocketClient discordClient)
+        public DiscordPingModule(DiscordSocketClient client)
         {
-            _discordClient = discordClient;
+            _client = client;
         }
 
         public void Initialize()
         {
-            _discordClient.MessageReceived += async message =>
+            _client.MessageReceived += async message =>
             {
                 if (message.Content != "!ping") return;
                 if (!((SocketGuildUser) message.Author).GuildPermissions.ManageGuild) return;

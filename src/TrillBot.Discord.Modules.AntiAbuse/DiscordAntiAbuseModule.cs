@@ -6,21 +6,21 @@ using TrillBot.Discord.Modules.AntiAbuse.Confusables;
 
 namespace TrillBot.Discord.Modules.AntiAbuse
 {
-    internal sealed class AntiAbuseDiscordModule : IDiscordModule
+    internal sealed class DiscordAntiAbuseModule : IDiscordModule
     {
         private const string MessagingTag = "Anti-Abuse";
 
         private readonly DiscordSocketClient _client;
         private readonly ConfusablesDetection _confusablesDetection;
         private readonly DiscordGuildUserAvailability _guildUserAvailability;
-        private readonly IStringLocalizer<AntiAbuseDiscordModule> _localizer;
+        private readonly IStringLocalizer<DiscordAntiAbuseModule> _localizer;
         private readonly DiscordMessaging _messaging;
 
-        public AntiAbuseDiscordModule(
+        public DiscordAntiAbuseModule(
             DiscordSocketClient client,
             DiscordGuildUserAvailability guildUserAvailability,
             DiscordMessaging messaging,
-            IStringLocalizer<AntiAbuseDiscordModule> localizer)
+            IStringLocalizer<DiscordAntiAbuseModule> localizer)
         {
             _client = client;
             _guildUserAvailability = guildUserAvailability;

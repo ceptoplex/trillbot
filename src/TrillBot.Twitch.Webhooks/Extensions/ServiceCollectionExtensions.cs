@@ -64,7 +64,8 @@ namespace TrillBot.Twitch.Webhooks.Extensions
             if (services.All(_ => _.ServiceType != typeof(ITwitchApiClient)) ||
                 services.All(_ => _.ServiceType != typeof(ITwitchAppAccessTokenProvider)))
                 throw new InvalidOperationException(
-                    "Before adding Twitch Webhooks, please add Twitch API services to the collection at first.");
+                    $"Before adding {nameof(TrillBot)}.{nameof(Twitch)}.{nameof(Webhooks)} services, " +
+                    $"please add {nameof(TrillBot)}.{nameof(Twitch)}.{nameof(Api)} services at first.");
 
             services.TryAddSingleton<
                 IWebSubSubscriptionMetadataResolver,
@@ -83,16 +84,16 @@ namespace TrillBot.Twitch.Webhooks.Extensions
             WebSubOptions webSubOptions,
             Action<TwitchWebhooksOptions> configureOptions)
         {
-            var twitchWebhookOptions = new TwitchWebhooksOptions();
-            configureOptions(twitchWebhookOptions);
-            TranslateOptions(webSubOptions, twitchWebhookOptions);
+            var webhooksOptions = new TwitchWebhooksOptions();
+            configureOptions(webhooksOptions);
+            TranslateOptions(webSubOptions, webhooksOptions);
         }
 
         private static void TranslateOptions(
             WebSubOptions webSubOptions,
-            TwitchWebhooksOptions twitchWebhookOptions)
+            TwitchWebhooksOptions webhooksOptions)
         {
-            webSubOptions.CallbackPublicUrl = twitchWebhookOptions.CallbackPublicUrl;
+            webSubOptions.CallbackPublicUrl = webhooksOptions.CallbackPublicUrl;
             webSubOptions.Lease = Lease;
             webSubOptions.LeaseRenewalBuffer = LeaseRenewalBuffer;
         }
