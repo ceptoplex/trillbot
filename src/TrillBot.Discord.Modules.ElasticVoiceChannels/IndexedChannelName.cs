@@ -4,6 +4,10 @@ using Discord;
 
 namespace TrillBot.Discord.Modules.ElasticVoiceChannels
 {
+    // Unfortunately, Discord's latest rate limit update only allows to change the name of
+    // channels 2 times every 10 minutes per account and per channel.
+    // Therefore, the often changing channel index is temporarily no longer part of the name.
+    // TODO: Remove or replace channel indexing.
     internal sealed class IndexedChannelName : IEquatable<IndexedChannelName>
     {
         private static readonly Regex Pattern = new Regex(@"^(?<name>.+?)( \((?<index>\d+)\))?$");
@@ -21,13 +25,14 @@ namespace TrillBot.Discord.Modules.ElasticVoiceChannels
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Name == other.Name && Index == other.Index;
+            return Name == other.Name/* && Index == other.Index*/;
         }
 
         public string Format()
         {
             var indexString = Index.HasValue ? $" ({Index + 1})" : "";
-            return $"{Name}{indexString}";
+            /*return $"{Name}{indexString}";*/
+            return Name;
         }
 
         public override bool Equals(object obj)
