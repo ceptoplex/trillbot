@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <data name="Warning" xml:space="preserve">
+        <value>Dem Server treten gerade außergewöhnlich viele neue Nutzer bei.
+Dies könnten möglicherweise Bots sein.</value>
+    </data>
+    <data name="UserWasBanned" xml:space="preserve">
+        <value>Ein Nutzer mit dem Namen `{0}` und einige ähnlich benannte Nutzer werden aktuell automatisiert gebannt,
+weil in zu kurzer Zeit zu viele Nutzer mit ähnlichem Namen dem Server beigetreten sind.</value>
+    </data>
+    <data name="UserBanReason" xml:space="preserve">
+        <value>Beitritt zu vieler ähnlich benannter Nutzer in zu kurzer Zeit.</value>
+    </data>
+</root>

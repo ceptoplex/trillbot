@@ -1,11 +1,21 @@
+using Microsoft.Extensions.DependencyInjection;
+using TrillBot.Discord.Extensions;
+using TrillBot.Discord.Modules.AntiAbuse.Confusables;
+
 namespace TrillBot.Discord.Modules.AntiAbuse.Extensions
 {
     public static class ModuleBuilderExtensions
     {
-        public static Discord.Extensions.ServiceCollectionExtensions.ModuleBuilder AddAntiAbuse(
-            this Discord.Extensions.ServiceCollectionExtensions.ModuleBuilder moduleBuilder)
+        public static ServiceCollectionExtensions.ModuleBuilder AddAntiAbuse(
+            this ServiceCollectionExtensions.ModuleBuilder moduleBuilder)
         {
-            return moduleBuilder.AddModule<DiscordAntiAbuseModule>();
+            moduleBuilder.Services
+                .AddSingleton(new ConfusablesDetection(new ConfusablesCache()))
+                .AddSingleton<BotImpersonationMonitoring>()
+                .AddSingleton<JoinMonitoring>();
+
+            return moduleBuilder
+                .AddModule<DiscordAntiAbuseModule>();
         }
     }
 }
