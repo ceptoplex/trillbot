@@ -20,6 +20,7 @@ It offers the following functionality:
 
 - __Anti-Abuse:__ Abuse is detected and mitigated:
     - Users that try to impersonate the bot are kicked from the server.
+    - Large amounts of bots joining the server are detected and banned.
 - __Elastic Voice Channels:__ Voice channels are replicated automatically as soon as users join them.
   This ensures that there is always one empty voice channel available of each existing type
   (where different types means different names or different user limits).
