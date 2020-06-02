@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Fastenshtein;
 
@@ -16,7 +17,10 @@ namespace TrillBot.Discord.Modules.AntiAbuse.Confusables
             _confusablesCache = confusablesCache;
         }
 
-        public async Task<bool> TestConfusabilityAsync(string actual, string tested)
+        public async Task<bool> TestConfusabilityAsync(
+            string actual,
+            string tested,
+            CancellationToken cancellationToken = default)
         {
             var minRequiredDistance = actual.Length / 3;
 
@@ -27,24 +31,24 @@ namespace TrillBot.Discord.Modules.AntiAbuse.Confusables
             async Task<string> PrepareAsync(string input)
             {
                 var output = input;
-                output = await GetSkeletonAsync(output);
+                output = await GetSkeletonAsync(output, cancellationToken);
                 output = output.ToLowerInvariant();
                 return output;
             }
         }
 
-        private async Task<string> GetSkeletonAsync(string input)
+        private async Task<string> GetSkeletonAsync(string input, CancellationToken cancellationToken = default)
         {
             var output = input;
             output = output.Normalize(NormalizationForm.FormD);
-            output = await ReplaceConfusablesAsync(output);
+            output = await ReplaceConfusablesAsync(output, cancellationToken);
             output = output.Normalize(NormalizationForm.FormD);
             return output;
         }
 
-        private async Task<string> ReplaceConfusablesAsync(string input)
+        private async Task<string> ReplaceConfusablesAsync(string input, CancellationToken cancellationToken = default)
         {
-            var confusables = await _confusablesCache.GetAsync();
+            var confusables = await _confusablesCache.GetAsync(cancellationToken);
 
             var encoding = Encoding.UTF32;
             const int characterByteCount = 4;

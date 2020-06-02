@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Microsoft.Extensions.Localization;
@@ -10,15 +11,12 @@ namespace TrillBot.Discord.Modules.AntiAbuse
 {
     internal sealed class JoinMonitoring
     {
-        private const int MaxRecentlyJoinedUsersWithoutWarning = 10;
-        private const int MaxRecentlyJoinedConfusableUsers = 3;
-
         private readonly ConfusablesDetection _confusablesDetection;
         private readonly IStringLocalizer<JoinMonitoring> _localizer;
         private readonly DiscordMessaging _messaging;
 
-        private readonly IDictionary<IGuild, ICollection<JoinedUser>> _recentlyJoinedUsers =
-            new Dictionary<IGuild, ICollection<JoinedUser>>();
+        private readonly IDictionary<IGuild, RecentlyJoinedUsers> _recentlyJoinedUsers =
+            new Dictionary<IGuild, RecentlyJoinedUsers>();
 
         public JoinMonitoring(
             ConfusablesDetection confusablesDetection,
@@ -30,89 +28,221 @@ namespace TrillBot.Discord.Modules.AntiAbuse
             _messaging = messaging;
         }
 
-        public async Task<bool> AddUserAsync(IGuildUser user)
+        public async Task<bool> AddUserAsync(IGuildUser user, CancellationToken cancellationToken = default)
         {
-            var newlyJoinedUser = new JoinedUser(user);
-            var newlyJoinedUserName = newlyJoinedUser.User.Nickname ?? newlyJoinedUser.User.Username;
-            var recentlyJoinedUsers = GetRecentlyJoinedUsers(newlyJoinedUser.User.Guild);
+            var recentlyJoinedUsers = GetOrCreateRecentlyJoinedUsers(user.Guild);
 
-            var previouslyJoinedUser = recentlyJoinedUsers
-                .Where(_ => _.Joined.HasValue)
-                .OrderByDescending(_ => _.Joined.Value)
-                .FirstOrDefault();
-
-            if (previouslyJoinedUser != null &&
-                !previouslyJoinedUser.JoinedWith(newlyJoinedUser))
-                recentlyJoinedUsers.Clear();
-
-            if (recentlyJoinedUsers.All(_ => _.User.Id != newlyJoinedUser.User.Id))
-                recentlyJoinedUsers.Add(newlyJoinedUser);
-
-            if (recentlyJoinedUsers.Count == MaxRecentlyJoinedUsersWithoutWarning + 1)
-                await _messaging.LogGuildAsync(
-                    newlyJoinedUser.User.Guild,
-                    DiscordAntiAbuseModule.MessagingTag,
-                    $"{_localizer["Warning"]}");
-
-            var recentlyJoinedConfusableUsers = new List<JoinedUser>();
-            foreach (var recentlyJoinedUser in recentlyJoinedUsers)
-            {
-                var recentlyJoinedUserName = recentlyJoinedUser.User.Nickname ?? recentlyJoinedUser.User.Username;
-                if (await _confusablesDetection.TestConfusabilityAsync(recentlyJoinedUserName, newlyJoinedUserName))
-                    recentlyJoinedConfusableUsers.Add(recentlyJoinedUser);
-            }
-
-            if (recentlyJoinedConfusableUsers.Count == MaxRecentlyJoinedConfusableUsers + 1)
-            {
-                await _messaging.LogGuildAsync(
-                    user.Guild,
-                    DiscordAntiAbuseModule.MessagingTag,
-                    $"{_localizer["UserWasBanned", newlyJoinedUserName]}");
-
-                foreach (var recentlyJoinedConfusableUser in recentlyJoinedConfusableUsers)
-                    await BanUserAsync(recentlyJoinedConfusableUser.User);
-                return true;
-            }
-
-            if (recentlyJoinedConfusableUsers.Count > MaxRecentlyJoinedConfusableUsers + 1)
-            {
-                await BanUserAsync(newlyJoinedUser.User);
-                return true;
-            }
-
-            return false;
+            await recentlyJoinedUsers.AddAsync(user, cancellationToken);
+            await recentlyJoinedUsers.EnsureUserCountWarningAsync(cancellationToken);
+            return await recentlyJoinedUsers.EnsureConfusableUsersBannedAsync(cancellationToken);
         }
 
-        private ICollection<JoinedUser> GetRecentlyJoinedUsers(IGuild guild)
+        public void RemoveUser(IGuildUser user)
+        {
+            var recentlyJoinedUsers = GetOrCreateRecentlyJoinedUsers(user.Guild);
+
+            recentlyJoinedUsers.Remove(user);
+        }
+
+        private RecentlyJoinedUsers GetOrCreateRecentlyJoinedUsers(IGuild guild)
         {
             if (!_recentlyJoinedUsers.ContainsKey(guild))
-                _recentlyJoinedUsers[guild] = new List<JoinedUser>();
+                _recentlyJoinedUsers[guild] = new RecentlyJoinedUsers(this, guild);
             return _recentlyJoinedUsers[guild];
-        }
-
-        private async Task BanUserAsync(IGuildUser user)
-        {
-            await user.BanAsync(reason: $"[{DiscordAntiAbuseModule.MessagingTag}] {_localizer["UserBanReason"]}");
         }
 
         private sealed class JoinedUser
         {
-            private static readonly TimeSpan SimultaneousJoinTimeframe = TimeSpan.FromMinutes(5);
+            private readonly JoinMonitoring _joinMonitoring;
 
-            public JoinedUser(IGuildUser user)
+            public JoinedUser(JoinMonitoring joinMonitoring, IGuildUser user)
             {
+                _joinMonitoring = joinMonitoring;
                 User = user;
-                Joined = DateTime.UtcNow;
             }
 
             public IGuildUser User { get; }
-            public DateTime? Joined { get; }
+            public DateTime Joined { get; } = DateTime.UtcNow;
+            public bool Available { get; private set; } = true;
 
-            public bool JoinedWith(JoinedUser user)
+            public async Task BanAsync(CancellationToken cancellationToken = default)
             {
-                if (!Joined.HasValue || !user.Joined.HasValue)
-                    return false;
-                return Joined - user.Joined <= SimultaneousJoinTimeframe;
+                if (!Available) return;
+
+                await User.BanAsync(
+                    reason: $"[{DiscordAntiAbuseModule.MessagingTag}] {_joinMonitoring._localizer["UserBanReason"]}");
+
+                Remove();
+            }
+
+            public void Remove()
+            {
+                Available = false;
+            }
+        }
+
+        private sealed class RecentlyJoinedUsers
+        {
+            private readonly ICollection<JoinedUser> _all =
+                new List<JoinedUser>();
+
+            private readonly ISet<string> _bannedConfusableUserNames = new HashSet<string>();
+
+            private readonly IDictionary<string, ICollection<JoinedUser>> _byName =
+                new Dictionary<string, ICollection<JoinedUser>>();
+
+            private readonly IGuild _guild;
+
+            private readonly JoinMonitoring _joinMonitoring;
+
+            private bool _userCountWarningIssued;
+
+            public RecentlyJoinedUsers(JoinMonitoring joinMonitoring, IGuild guild)
+            {
+                _joinMonitoring = joinMonitoring;
+                _guild = guild;
+            }
+
+            public async Task AddAsync(IGuildUser user, CancellationToken cancellationToken = default)
+            {
+                if (_all.Any(_ => _.User.Id == user.Id))
+                    return;
+
+                var newUser = new JoinedUser(_joinMonitoring, user);
+                var newUserName = user.Nickname ?? user.Username;
+
+                _all.Add(newUser);
+
+                var added = false;
+
+                foreach (var (userName, users) in _byName)
+                    if (await _joinMonitoring._confusablesDetection.TestConfusabilityAsync(
+                        userName,
+                        newUserName,
+                        cancellationToken))
+                    {
+                        users.Add(newUser);
+                        added = true;
+                    }
+
+                if (!added)
+                    _byName[newUserName] = new List<JoinedUser> {newUser};
+            }
+
+            public void Remove(IGuildUser user)
+            {
+                foreach (var existingUser in _all)
+                    if (existingUser.User.Id == user.Id)
+                        existingUser.Remove();
+            }
+
+            public async Task EnsureUserCountWarningAsync(CancellationToken cancellationToken = default)
+            {
+                if (!IsUserCountWarningRequired())
+                    return;
+
+                await _joinMonitoring._messaging.LogGuildAsync(
+                    _guild,
+                    DiscordAntiAbuseModule.MessagingTag,
+                    $"{_joinMonitoring._localizer["Warning"]}",
+                    cancellationToken: cancellationToken);
+            }
+
+            public async Task<bool> EnsureConfusableUsersBannedAsync(CancellationToken cancellationToken = default)
+            {
+                var anyoneBanned = false;
+
+                foreach (var (confusableUserName, confusableUsers) in GetUnbannedConfusableUsers())
+                {
+                    if (!_bannedConfusableUserNames.Contains(confusableUserName))
+                    {
+                        await _joinMonitoring._messaging.LogGuildAsync(
+                            _guild,
+                            DiscordAntiAbuseModule.MessagingTag,
+                            $"{_joinMonitoring._localizer["UserWasBanned", confusableUserName]}",
+                            cancellationToken: cancellationToken);
+                        _bannedConfusableUserNames.Add(confusableUserName);
+                    }
+
+                    foreach (var confusableUser in confusableUsers)
+                    {
+                        await confusableUser.BanAsync(cancellationToken);
+                        anyoneBanned = true;
+                    }
+                }
+
+                return anyoneBanned;
+            }
+
+            private bool IsUserCountWarningRequired()
+            {
+                RemoveOld();
+
+                var now = DateTime.UtcNow;
+                var count = _all.Count(_ => now - _.Joined <= UserCountWarningConfiguration.Timeframe);
+
+                if (count >= UserCountWarningConfiguration.OnThreshold && !_userCountWarningIssued)
+                {
+                    _userCountWarningIssued = true;
+                    return true;
+                }
+
+                if (count <= UserCountWarningConfiguration.OffThreshold) _userCountWarningIssued = false;
+
+                return false;
+            }
+
+            private IDictionary<string, IEnumerable<JoinedUser>> GetUnbannedConfusableUsers()
+            {
+                RemoveOld();
+
+                var now = DateTime.UtcNow;
+
+                return _byName
+                    .Where(_1 =>
+                        _1.Value.Count(_2 => now - _2.Joined <= ConfusableUserCountConfiguration.Timeframe) >=
+                        ConfusableUserCountConfiguration.Threshold)
+                    .ToDictionary(
+                        _ => _.Key,
+                        _1 => _1.Value.Where(_2 => _2.Available));
+            }
+
+            private void RemoveOld()
+            {
+                var trackingTimeframe =
+                    UserCountWarningConfiguration.Timeframe > ConfusableUserCountConfiguration.Timeframe
+                        ? UserCountWarningConfiguration.Timeframe
+                        : ConfusableUserCountConfiguration.Timeframe;
+                var now = DateTime.UtcNow;
+
+                foreach (var (userName, users) in _byName)
+                {
+                    foreach (var user in users)
+                        if (now - user.Joined > trackingTimeframe)
+                        {
+                            _all.Remove(user);
+                            users.Remove(user);
+                        }
+
+                    if (users.Count == 0)
+                        _byName.Remove(userName);
+                }
+            }
+
+            // If more than 15 users join within one hour, issue a warning.
+            // Issue a new warning only if this happens again after join rate has dropped below 10 users per hour.
+            private static class UserCountWarningConfiguration
+            {
+                public const int OnThreshold = 15 + 1;
+                public const int OffThreshold = 10 - 1;
+                public static readonly TimeSpan Timeframe = TimeSpan.FromHours(1);
+            }
+
+            // If more than 3 user with confusable names join within one day, ban all of them automatically.
+            private static class ConfusableUserCountConfiguration
+            {
+                public const int Threshold = 3;
+                public static readonly TimeSpan Timeframe = TimeSpan.FromDays(1);
             }
         }
     }

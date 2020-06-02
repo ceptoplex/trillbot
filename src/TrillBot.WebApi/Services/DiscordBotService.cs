@@ -16,12 +16,12 @@ namespace TrillBot.WebApi.Services
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            await _discordBot.StartAsync();
+            await _discordBot.StartAsync(cancellationToken);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            await _discordBot.StopAsync();
+            await _discordBot.StopAsync(cancellationToken);
         }
     }
 }

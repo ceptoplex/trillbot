@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 
@@ -24,7 +25,7 @@ namespace TrillBot.Discord.Modules.AntiAbuse
             _joinMonitoring = joinMonitoring;
         }
 
-        public void Initialize()
+        public Task InitializeAsync(CancellationToken cancellationToken = default)
         {
             _client.Ready += async () =>
             {
@@ -36,8 +37,14 @@ namespace TrillBot.Discord.Modules.AntiAbuse
             _client.JoinedGuild += OnGuildAvailable;
             _client.UserJoined += async user =>
             {
-                if (await _botImpersonationMonitoring.AddUserAsync(user)) return;
-                await _joinMonitoring.AddUserAsync(user);
+                if (await _botImpersonationMonitoring.AddUserAsync(user, cancellationToken)) return;
+                await _joinMonitoring.AddUserAsync(user, cancellationToken);
+            };
+            _client.UserLeft += user =>
+            {
+                _joinMonitoring.RemoveUser(user);
+
+                return Task.CompletedTask;
             };
             _client.GuildMemberUpdated += async (oldUser, newUser) =>
             {
@@ -45,15 +52,17 @@ namespace TrillBot.Discord.Modules.AntiAbuse
                     oldUser.Nickname == newUser.Nickname)
                     return;
 
-                await _botImpersonationMonitoring.AddUserAsync(newUser);
+                await _botImpersonationMonitoring.AddUserAsync(newUser, cancellationToken);
             };
 
             async Task OnGuildAvailable(SocketGuild guild)
             {
                 await _guildUserAvailability.EnsureAllUsersAvailableAsync(guild);
                 foreach (var user in guild.Users)
-                    await _botImpersonationMonitoring.AddUserAsync(user);
+                    await _botImpersonationMonitoring.AddUserAsync(user, cancellationToken);
             }
+
+            return Task.CompletedTask;
         }
     }
 }

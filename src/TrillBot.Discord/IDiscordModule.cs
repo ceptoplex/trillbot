@@ -1,7 +1,10 @@
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace TrillBot.Discord
 {
     public interface IDiscordModule
     {
-        void Initialize();
+        Task InitializeAsync(CancellationToken cancellationToken = default);
     }
 }

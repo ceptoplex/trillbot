@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -31,7 +32,7 @@ namespace TrillBot.Discord
 
         public bool Connected => _discordClient.ConnectionState == ConnectionState.Connected;
 
-        public async Task StartAsync()
+        public async Task StartAsync(CancellationToken cancellationToken = default)
         {
             _discordClient.Log += message =>
             {
@@ -43,13 +44,14 @@ namespace TrillBot.Discord
                 return Task.CompletedTask;
             };
 
-            foreach (var module in _serviceProvider.GetServices<IDiscordModule>()) module.Initialize();
+            foreach (var module in _serviceProvider.GetServices<IDiscordModule>())
+                await module.InitializeAsync(cancellationToken);
 
             await _discordClient.LoginAsync(TokenType.Bot, _options.Token);
             await _discordClient.StartAsync();
         }
 
-        public async Task StopAsync()
+        public async Task StopAsync(CancellationToken cancellationToken = default)
         {
             await _discordClient.StopAsync();
         }

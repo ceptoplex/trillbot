@@ -1,3 +1,5 @@
+using System.Threading;
+using System.Threading.Tasks;
 using Discord.WebSocket;
 
 namespace TrillBot.Discord.Modules.Ping
@@ -11,7 +13,7 @@ namespace TrillBot.Discord.Modules.Ping
             _client = client;
         }
 
-        public void Initialize()
+        public Task InitializeAsync(CancellationToken cancellationToken = default)
         {
             _client.MessageReceived += async message =>
             {
@@ -19,6 +21,8 @@ namespace TrillBot.Discord.Modules.Ping
                 if (!((SocketGuildUser) message.Author).GuildPermissions.ManageGuild) return;
                 await message.Channel.SendMessageAsync("pong!");
             };
+
+            return Task.CompletedTask;
         }
     }
 }

@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Net;
@@ -19,7 +20,12 @@ namespace TrillBot.Discord
             _options = options.Value;
         }
 
-        public async Task LogGuildAsync(IGuild guild, string tag, string text, Embed embed = default)
+        public async Task LogGuildAsync(
+            IGuild guild,
+            string tag,
+            string text,
+            Embed embed = default,
+            CancellationToken cancellationToken = default)
         {
             if (_options.LogChannelIds == null)
                 return;
@@ -37,7 +43,11 @@ namespace TrillBot.Discord
             }
         }
 
-        public async Task<bool> LogUserAsync(IUser user, string text, Embed embed = default)
+        public static async Task<bool> LogUserAsync(
+            IUser user,
+            string text,
+            Embed embed = default,
+            CancellationToken cancellationToken = default)
         {
             try
             {

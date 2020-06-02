@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -24,7 +25,7 @@ namespace TrillBot.Discord.Modules.AntiAbuse
             _confusablesDetection = new ConfusablesDetection(new ConfusablesCache());
         }
 
-        public async Task<bool> AddUserAsync(IGuildUser user)
+        public async Task<bool> AddUserAsync(IGuildUser user, CancellationToken cancellationToken = default)
         {
             var bot = await user.Guild.GetUserAsync(_client.CurrentUser.Id);
             if (user.Id == bot.Id)
@@ -33,17 +34,19 @@ namespace TrillBot.Discord.Modules.AntiAbuse
             var botName = bot.Nickname ?? bot.Username;
             var userName = user.Nickname ?? user.Username;
 
-            if (!await _confusablesDetection.TestConfusabilityAsync(botName, userName))
+            if (!await _confusablesDetection.TestConfusabilityAsync(botName, userName, cancellationToken))
                 return false;
 
-            var notified = await _messaging.LogUserAsync(
+            var notified = await DiscordMessaging.LogUserAsync(
                 user,
-                _localizer["YouWereKicked", bot.Guild.Name, userName]);
+                _localizer["YouWereKicked", bot.Guild.Name, userName],
+                cancellationToken: cancellationToken);
             await _messaging.LogGuildAsync(
                 bot.Guild,
                 DiscordAntiAbuseModule.MessagingTag,
                 $"{_localizer["UserWasKicked", user.Mention, userName, bot.Mention]}\n" +
-                $"*{(notified ? _localizer["UserWasNotified"] : _localizer["UserWasNotNotified"])}*");
+                $"*{(notified ? _localizer["UserWasNotified"] : _localizer["UserWasNotNotified"])}*",
+                cancellationToken: cancellationToken);
 
             // Kick afterwards, or messaging the user will not work anymore.
             await user.KickAsync(

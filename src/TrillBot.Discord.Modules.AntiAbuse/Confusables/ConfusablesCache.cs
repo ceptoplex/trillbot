@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TrillBot.Discord.Modules.AntiAbuse.Confusables
@@ -15,19 +16,19 @@ namespace TrillBot.Discord.Modules.AntiAbuse.Confusables
         private readonly IDictionary<uint, IEnumerable<uint>> _cache = new Dictionary<uint, IEnumerable<uint>>();
         private DateTime? _cacheUpdated;
 
-        public async Task<IDictionary<uint, IEnumerable<uint>>> GetAsync()
+        public async Task<IDictionary<uint, IEnumerable<uint>>> GetAsync(CancellationToken cancellationToken = default)
         {
-            await EnsureFetchedAsync();
+            await EnsureFetchedAsync(cancellationToken);
             return _cache;
         }
 
-        private async Task EnsureFetchedAsync()
+        private async Task EnsureFetchedAsync(CancellationToken cancellationToken = default)
         {
             if (_cacheUpdated.HasValue && DateTime.UtcNow - _cacheUpdated.Value < CacheMaxAge) return;
-            await FetchAsync();
+            await FetchAsync(cancellationToken);
         }
 
-        private async Task FetchAsync()
+        private async Task FetchAsync(CancellationToken cancellationToken = default)
         {
             var newlineSeparators = new[] {"\r\n", "\n", "\r"};
             const char commentSeparator = '#';

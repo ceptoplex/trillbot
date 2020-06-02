@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -25,7 +26,7 @@ namespace TrillBot.Discord.Modules.ElasticVoiceChannels
             _options = options.Value;
         }
 
-        public void Initialize()
+        public Task InitializeAsync(CancellationToken cancellationToken = default)
         {
             _client.GuildAvailable += OnGuildAvailable;
             _client.JoinedGuild += OnGuildAvailable;
@@ -62,6 +63,8 @@ namespace TrillBot.Discord.Modules.ElasticVoiceChannels
                 var channel = newState.VoiceChannel ?? oldState.VoiceChannel;
                 await FixNextChannelAsync(channel.Guild);
             }
+
+            return Task.CompletedTask;
         }
 
         private async Task FixNextChannelAsync(SocketGuild guild)
