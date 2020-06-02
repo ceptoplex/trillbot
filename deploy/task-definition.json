@@ -21,7 +21,7 @@
         },
         {
           "name": "VIRTUAL_PORT",
-          "value": "80"
+          "value": "5000"
         }
       ],
       "secrets": [
