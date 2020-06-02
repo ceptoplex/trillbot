@@ -14,6 +14,7 @@ using TrillBot.Discord.Options;
 using TrillBot.Twitch.Api.Extensions;
 using TrillBot.Twitch.Api.Options;
 using TrillBot.Twitch.Webhooks.Extensions;
+using TrillBot.WebApi.Health;
 using TrillBot.WebApi.Options;
 using TrillBot.WebApi.Services;
 
@@ -61,6 +62,9 @@ namespace TrillBot.WebApi
             services
                 .AddControllers()
                 .AddNewtonsoftJson();
+            services
+                .AddHealthChecks()
+                .AddCheck<DiscordBotHealthCheck>(nameof(DiscordBotHealthCheck));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -73,7 +77,11 @@ namespace TrillBot.WebApi
 
             app.UseRouting();
 
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapHealthChecks("health");
+            });
         }
     }
 }

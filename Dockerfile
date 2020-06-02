@@ -25,4 +25,8 @@ FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
 WORKDIR /app
 
 COPY --from=build-env /app/out .
+
+EXPOSE 5000
+HEALTHCHECK --interval=60s --timeout=5s --retries=3 \
+    CMD curl -f "http://localhost:5000/health" || exit 1
 ENTRYPOINT ["dotnet", "TrillBot.WebApi.dll"]

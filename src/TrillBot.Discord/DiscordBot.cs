@@ -29,6 +29,8 @@ namespace TrillBot.Discord
             _logger = logger;
         }
 
+        public bool Connected => _discordClient.ConnectionState == ConnectionState.Connected;
+
         public async Task StartAsync()
         {
             _discordClient.Log += message =>

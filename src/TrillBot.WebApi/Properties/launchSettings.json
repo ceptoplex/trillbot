@@ -10,7 +10,7 @@
     },
     "TrillBot.WebApi (Production)": {
       "commandName": "Project",
-      "applicationUrl": "http://0.0.0.0:80",
+      "applicationUrl": "http://0.0.0.0:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Production"
       }
