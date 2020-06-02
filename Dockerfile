@@ -26,6 +26,8 @@ WORKDIR /app
 
 COPY --from=build-env /app/out .
 
+ENV ASPNETCORE_URLS="http://0.0.0.0:5000"
+
 EXPOSE 5000
 HEALTHCHECK --interval=60s --timeout=5s --retries=3 \
     CMD curl -f "http://localhost:5000/health" || exit 1
