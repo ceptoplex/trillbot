@@ -2,7 +2,8 @@
 <root>
     <data name="Warning" xml:space="preserve">
         <value>Dem Server treten gerade außergewöhnlich viele neue Nutzer bei.
-Dies könnten möglicherweise Bots sein.</value>
+Dies könnten möglicherweise Bots sein.
+Das Verifikationslevel wurde erhöht.</value>
     </data>
     <data name="UserWasBanned" xml:space="preserve">
         <value>Ein Nutzer mit dem Namen `{0}` und einige ähnlich benannte Nutzer werden aktuell automatisiert gebannt,
